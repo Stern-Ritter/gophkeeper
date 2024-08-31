@@ -1,0 +1,11 @@
+{
+  "address": "localhost:8080",
+  "database_dsn": "postgres://postgres:postgres@localhost:5432/postgres",
+  "file_storage_directory": "/files",
+  "authentication_key": "kqNyh1z4Lv64gFXR4sTk2My7yDFEJBBJ",
+  "encryption_key": "HmQkWX1zTb6l3P8V8f3Eiw==",
+  "tls_cert": "./certs/server-cert.pem",
+  "tls_key": "./certs/server-key.pem",
+  "shutdown_timeout": 5,
+  "logger_level": "info"
+}

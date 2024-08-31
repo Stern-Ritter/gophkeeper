@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package gophkeeper.gophkeeperapi.v1;
+
+import "gophkeeper/gophkeeperapi/v1/account.proto";
+
+option go_package = "gophkeeper/gophkeeperapi/v1";
+
+service AccountServiceV1 {
+  rpc AddAccount(AddAccountRequestV1) returns (AddAccountResponseV1);
+  rpc DeleteAccount(DeleteAccountRequestV1) returns (DeleteAccountResponseV1);
+  rpc GetAccounts(GetAccountsRequestV1) returns (GetAccountsResponseV1);
+}

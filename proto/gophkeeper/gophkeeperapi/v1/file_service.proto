@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package gophkeeper.gophkeeperapi.v1;
+
+import "gophkeeper/gophkeeperapi/v1/file.proto";
+
+option go_package = "gophkeeper/gophkeeperapi/v1";
+
+service FileServiceV1 {
+  rpc UploadFile(stream UploadFileRequestV1) returns (UploadFileResponseV1);
+  rpc DownloadFile(DownloadFileRequestV1) returns (stream DownloadFileResponseV1);
+  rpc DeleteFile(DeleteFileRequestV1) returns (DeleteFileResponseV1);
+  rpc GetFiles(GetFilesRequestV1) returns (GetFilesResponseV1);
+}

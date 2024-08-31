@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package gophkeeper.gophkeeperapi.v1;
+
+import "buf/validate/validate.proto";
+
+option go_package = "gophkeeper/gophkeeperapi/v1";
+
+message TextV1 {
+  string id = 1;
+  string user_id = 2;
+  string text = 3;
+  string comment = 4;
+}
+
+message AddTextRequestV1 {
+  string text = 1 [(buf.validate.field).cel = {
+    id: "text",
+    expression: "size(this) >= 1",
+    message: "Text must not be empty"
+  }];
+  string comment = 2 [(buf.validate.field).cel = {
+    id: "comment",
+    expression: "size(this) <= 1024",
+    message: "Comment should not exceed 1024 characters"
+  }];
+}
+
+message AddTextResponseV1 {}
+
+message DeleteTextRequestV1 {
+  string id = 1 [(buf.validate.field).cel = {
+    id: "id",
+    expression: "size(this) >= 1",
+    message: "Deleted text data ID must not be empty"
+  }];
+}
+
+message DeleteTextResponseV1 {}
+
+message GetTextsRequestV1 {}
+
+message GetTextsResponseV1 {
+  repeated TextV1 texts = 1;
+}

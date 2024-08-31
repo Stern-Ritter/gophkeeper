@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package gophkeeper.gophkeeperapi.v1;
+
+import "buf/validate/validate.proto";
+
+option go_package = "gophkeeper/gophkeeperapi/v1";
+
+message FileV1 {
+  string id = 1;
+  string user_id = 2;
+  string name = 3;
+  int64 size = 4;
+  string comment = 5;
+}
+
+message UploadFileRequestV1 {
+  string name = 1 [(buf.validate.field).cel = {
+    id: "name",
+    expression: "size(this) >= 1 && size(this) <= 256",
+    message: "File name must not be empty and should not exceed 256 characters"
+  }];
+  string comment = 2 [(buf.validate.field).cel = {
+    id: "comment",
+    expression: "size(this) <= 1024",
+    message: "Comment should not exceed 1024 characters"
+  }];
+  bytes data = 3;
+}
+
+message UploadFileResponseV1 {}
+
+message DownloadFileRequestV1 {
+  string id = 1 [(buf.validate.field).cel = {
+    id: "id",
+    expression: "size(this) >= 1",
+    message: "Downloaded file ID must not be empty"
+  }];
+}
+
+message DownloadFileResponseV1 {
+  string name = 1;
+  int64 size = 2;
+  bytes data = 3;
+}
+
+message DeleteFileRequestV1 {
+  string id = 1 [(buf.validate.field).cel = {
+    id: "id",
+    expression: "size(this) >= 1",
+    message: "Deleted file ID must not be empty"
+  }];
+}
+
+message DeleteFileResponseV1 {}
+
+message GetFilesRequestV1 {}
+
+message GetFilesResponseV1 {
+  repeated FileV1 files = 1;
+}
