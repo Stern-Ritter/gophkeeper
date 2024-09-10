@@ -8,7 +8,7 @@ import (
 )
 
 // VersionView displays the application version and build date, and back button to return to the main menu.
-func (c *Client) VersionView() {
+func (c *ClientImpl) VersionView() tview.Primitive {
 	header := tview.NewTextView().
 		SetText("About application").
 		SetTextColor(tcell.ColorYellow).
@@ -27,7 +27,9 @@ func (c *Client) VersionView() {
 		SetDirection(tview.FlexRow).
 		AddItem(header, 3, 1, false).
 		AddItem(aboutBlock, 0, 1, false).
-		AddItem(buttons, 3, 1, true)
+		AddItem(buttons, 3, 1, false)
 
 	selectView(c.app, flex)
+
+	return flex
 }

@@ -12,7 +12,7 @@ const (
 )
 
 // AuthInterceptor is a gRPC unary interceptor that adds an authorization token to the outgoing context metadata.
-func (c *Client) AuthInterceptor(
+func (c *ClientImpl) AuthInterceptor(
 	ctx context.Context,
 	method string,
 	req interface{},
@@ -28,7 +28,7 @@ func (c *Client) AuthInterceptor(
 }
 
 // AuthStreamInterceptor is a gRPC stream interceptor that adds an authorization token to the outgoing context metadata.
-func (c *Client) AuthStreamInterceptor(
+func (c *ClientImpl) AuthStreamInterceptor(
 	ctx context.Context,
 	desc *grpc.StreamDesc,
 	cc *grpc.ClientConn,

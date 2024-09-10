@@ -8,7 +8,7 @@ import (
 )
 
 // AuthView displays an authentication form for the user to sign in or sign up.
-func (c *Client) AuthView() {
+func (c *ClientImpl) AuthView() tview.Primitive {
 	form := tview.NewForm()
 	form.AddInputField("Login", "", 20, nil, nil).
 		AddInputField("Password", "", 20, nil, nil).
@@ -17,6 +17,8 @@ func (c *Client) AuthView() {
 		AddButton("Quit", func() { stopApp(c.app) })
 
 	selectView(c.app, form)
+
+	return form
 }
 
 // signUpHandler handles the sign-up process.
@@ -24,7 +26,7 @@ func (c *Client) AuthView() {
 // and handles the response.
 // If sign-up is successful, the user's authentication token is stored and the main view is displayed.
 // If sign-up fails, a retry modal is shown with options to try again or cancel.
-func (c *Client) signUpHandler(form *tview.Form) {
+func (c *ClientImpl) signUpHandler(form *tview.Form) {
 	login := form.GetFormItemByLabel("Login").(*tview.InputField).GetText()
 	password := form.GetFormItemByLabel("Password").(*tview.InputField).GetText()
 
@@ -49,7 +51,7 @@ func (c *Client) signUpHandler(form *tview.Form) {
 // and handles the response.
 // If sign-in is successful, the user's authentication token is stored and the main view is displayed.
 // If sign-in fails, a retry modal is shown with options to try again or cancel.
-func (c *Client) signInHandler(form *tview.Form) {
+func (c *ClientImpl) signInHandler(form *tview.Form) {
 	login := form.GetFormItemByLabel("Login").(*tview.InputField).GetText()
 	password := form.GetFormItemByLabel("Password").(*tview.InputField).GetText()
 

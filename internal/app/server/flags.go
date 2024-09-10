@@ -13,7 +13,7 @@ import (
 	"github.com/Stern-Ritter/gophkeeper/internal/utils"
 )
 
-type jsonConfig struct {
+type appConfig struct {
 	URL               string `json:"address,omitempty"`
 	DatabaseDSN       string `json:"database_dsn,omitempty"`
 	FileStoragePath   string `json:"file_storage_directory,omitempty"`
@@ -77,26 +77,26 @@ func parseJSONConfig(cfg *config.ServerConfig, fPath string) error {
 		return fmt.Errorf("read config file %s: %w", fPath, err)
 	}
 
-	jsonCfg := jsonConfig{}
-	err = json.Unmarshal(data, &jsonCfg)
+	appCfg := appConfig{}
+	err = json.Unmarshal(data, &appCfg)
 	if err != nil {
 		return fmt.Errorf("parse config file %s: %w", fPath, err)
 	}
 
-	mergeJSONConfig(cfg, jsonCfg)
+	mergeJSONConfig(cfg, appCfg)
 	return nil
 }
 
-func mergeJSONConfig(cfg *config.ServerConfig, jsonCfg jsonConfig) {
-	cfg.URL = utils.Coalesce(cfg.URL, jsonCfg.URL)
-	cfg.DatabaseDSN = utils.Coalesce(cfg.DatabaseDSN, jsonCfg.DatabaseDSN)
-	cfg.FileStoragePath = utils.Coalesce(cfg.FileStoragePath, jsonCfg.FileStoragePath)
-	cfg.AuthenticationKey = utils.Coalesce(cfg.AuthenticationKey, jsonCfg.AuthenticationKey)
-	cfg.EncryptionKey = utils.Coalesce(cfg.EncryptionKey, jsonCfg.EncryptionKey)
-	cfg.TLSCertPath = utils.Coalesce(cfg.TLSCertPath, jsonCfg.TLSCertPath)
-	cfg.TLSKeyPath = utils.Coalesce(cfg.TLSKeyPath, jsonCfg.TLSKeyPath)
-	cfg.ShutdownTimeout = utils.Coalesce(cfg.ShutdownTimeout, jsonCfg.ShutdownTimeout)
-	cfg.LoggerLvl = utils.Coalesce(cfg.LoggerLvl, jsonCfg.LoggerLvl)
+func mergeJSONConfig(cfg *config.ServerConfig, appCfg appConfig) {
+	cfg.URL = utils.Coalesce(cfg.URL, appCfg.URL)
+	cfg.DatabaseDSN = utils.Coalesce(cfg.DatabaseDSN, appCfg.DatabaseDSN)
+	cfg.FileStoragePath = utils.Coalesce(cfg.FileStoragePath, appCfg.FileStoragePath)
+	cfg.AuthenticationKey = utils.Coalesce(cfg.AuthenticationKey, appCfg.AuthenticationKey)
+	cfg.EncryptionKey = utils.Coalesce(cfg.EncryptionKey, appCfg.EncryptionKey)
+	cfg.TLSCertPath = utils.Coalesce(cfg.TLSCertPath, appCfg.TLSCertPath)
+	cfg.TLSKeyPath = utils.Coalesce(cfg.TLSKeyPath, appCfg.TLSKeyPath)
+	cfg.ShutdownTimeout = utils.Coalesce(cfg.ShutdownTimeout, appCfg.ShutdownTimeout)
+	cfg.LoggerLvl = utils.Coalesce(cfg.LoggerLvl, appCfg.LoggerLvl)
 }
 
 func mergeDefaultConfig(cfg *config.ServerConfig, defaultCfg config.ServerConfig) {

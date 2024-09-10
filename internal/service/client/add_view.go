@@ -16,30 +16,34 @@ import (
 // - "Add text data: text note" with the shortcut 't'.
 // - "Add file data: upload file" with the shortcut 'f'.
 // - "Back" with the shortcut 'b'.
-func (c *Client) AddView() {
+func (c *ClientImpl) AddView() tview.Primitive {
 	menu := tview.NewList()
-	menu.AddItem("Add account data: login password pair", "", 'a', c.AddAccountView).
-		AddItem("Add card data: payment card details", "", 'c', c.AddCardView).
-		AddItem("Add text data: text note", "", 't', c.AddTextView).
-		AddItem("Add file data: upload file", "", 'f', c.AddFileView).
-		AddItem("Back", "", 'b', c.MainView)
+	menu.AddItem("Add account data: login password pair", "", 'a', func() { c.AddAccountView() }).
+		AddItem("Add card data: payment card details", "", 'c', func() { c.AddCardView() }).
+		AddItem("Add text data: text note", "", 't', func() { c.AddTextView() }).
+		AddItem("Add file data: upload file", "", 'f', func() { c.AddFileView() }).
+		AddItem("Back", "", 'b', func() { c.MainView() })
 
 	selectView(c.app, menu)
+
+	return menu
 }
 
 // AddAccountView creates and displays a form for adding user account data.
-func (c *Client) AddAccountView() {
+func (c *ClientImpl) AddAccountView() tview.Primitive {
 	form := tview.NewForm()
 	form.AddInputField("Login", "", 20, nil, nil).
 		AddInputField("Password", "", 20, nil, nil).
 		AddInputField("Comment", "", 20, nil, nil).
-		AddButton("Add", func() { c.addAccountHandler(form) }).AddButton("Cancel", c.MainView)
+		AddButton("Add", func() { c.addAccountHandler(form) }).AddButton("Cancel", func() { c.MainView() })
 
 	selectView(c.app, form)
+
+	return form
 }
 
 // addAccountHandler processes the form submit for adding user account data.
-func (c *Client) addAccountHandler(form *tview.Form) {
+func (c *ClientImpl) addAccountHandler(form *tview.Form) {
 	login := form.GetFormItemByLabel("Login").(*tview.InputField).GetText()
 	password := form.GetFormItemByLabel("Password").(*tview.InputField).GetText()
 	comment := form.GetFormItemByLabel("Comment").(*tview.InputField).GetText()
@@ -60,7 +64,7 @@ func (c *Client) addAccountHandler(form *tview.Form) {
 }
 
 // AddCardView creates and displays a form for adding user card data.
-func (c *Client) AddCardView() {
+func (c *ClientImpl) AddCardView() tview.Primitive {
 	form := tview.NewForm()
 
 	form.AddInputField("Number", "", 20, nil, nil).
@@ -70,13 +74,15 @@ func (c *Client) AddCardView() {
 		AddInputField("PIN", "", 20, nil, nil).
 		AddInputField("Comment", "", 20, nil, nil).
 		AddButton("Add", func() { c.addCardHandler(form) }).
-		AddButton("Cancel", c.MainView)
+		AddButton("Cancel", func() { c.MainView() })
 
 	selectView(c.app, form)
+
+	return form
 }
 
 // addCardHandler processes the form submit for adding user card data.
-func (c *Client) addCardHandler(form *tview.Form) {
+func (c *ClientImpl) addCardHandler(form *tview.Form) {
 	number := form.GetFormItemByLabel("Number").(*tview.InputField).GetText()
 	owner := form.GetFormItemByLabel("Owner").(*tview.InputField).GetText()
 	expiry := form.GetFormItemByLabel("Expiry").(*tview.InputField).GetText()
@@ -100,18 +106,20 @@ func (c *Client) addCardHandler(form *tview.Form) {
 }
 
 // AddTextView creates and displays a form for adding user text data.
-func (c *Client) AddTextView() {
+func (c *ClientImpl) AddTextView() tview.Primitive {
 	form := tview.NewForm()
 	form.AddInputField("Text", "", 40, nil, nil).
 		AddInputField("Comment", "", 20, nil, nil).
 		AddButton("Add", func() { c.addTextHandler(form) }).
-		AddButton("Cancel", c.MainView)
+		AddButton("Cancel", func() { c.MainView() })
 
 	selectView(c.app, form)
+
+	return form
 }
 
 // addTextHandler processes the form submission for adding user text data.
-func (c *Client) addTextHandler(form *tview.Form) {
+func (c *ClientImpl) addTextHandler(form *tview.Form) {
 	text := form.GetFormItemByLabel("Text").(*tview.InputField).GetText()
 	comment := form.GetFormItemByLabel("Comment").(*tview.InputField).GetText()
 
@@ -131,19 +139,21 @@ func (c *Client) addTextHandler(form *tview.Form) {
 }
 
 // AddFileView creates and displays a form for upload user file to the server.
-func (c *Client) AddFileView() {
+func (c *ClientImpl) AddFileView() tview.Primitive {
 	form := tview.NewForm()
 
 	form.AddInputField("File path", "", 40, nil, nil).
 		AddInputField("Comment", "", 40, nil, nil).
 		AddButton("Upload", func() { c.uploadFileHandler(form) }).
-		AddButton("Cancel", c.MainView)
+		AddButton("Cancel", func() { c.MainView() })
 
 	selectView(c.app, form)
+
+	return form
 }
 
 // uploadFileHandler processes the form submit for upload user file to the server.
-func (c *Client) uploadFileHandler(form *tview.Form) {
+func (c *ClientImpl) uploadFileHandler(form *tview.Form) {
 	filePath := form.GetFormItemByLabel("File path").(*tview.InputField).GetText()
 	comment := form.GetFormItemByLabel("Comment").(*tview.InputField).GetText()
 

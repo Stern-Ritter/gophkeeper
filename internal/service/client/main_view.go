@@ -10,14 +10,16 @@ import (
 // - "Add new data: pair login - password, payment card details, text note, file" with the shortcut 'a'
 // - "Viewing data: pairs login - password, payment cards details, text notes, files" with the shortcut 'v'
 // - "Logout" with the shortcut 'q'
-func (c *Client) MainView() {
+func (c *ClientImpl) MainView() tview.Primitive {
 	menu := tview.NewList()
 	menu.AddItem("Add new data: pair login - password, payment card details, text note, file", "",
-		'a', c.AddView).
+		'a', func() { c.AddView() }).
 		AddItem("Viewing data: pairs login- password, payment cards details, text notes, files", "",
-			'v', c.DataView).
-		AddItem("Application version info", "", 'i', c.VersionView).
-		AddItem("Logout", "", 'q', c.AuthView)
+			'v', func() { c.DataView() }).
+		AddItem("Application version info", "", 'i', func() { c.VersionView() }).
+		AddItem("Logout", "", 'q', func() { c.AuthView() })
 
 	selectView(c.app, menu)
+
+	return menu
 }
