@@ -315,7 +315,7 @@ func downloadFile(c Client, fileService FileService, fileID string, dirPath stri
 // addTableListeners sets up listeners for a table.
 // It handles Enter key presses for triggering actions on clickable cells and
 // handles Esc key presses for returning to the previous view.
-func addTableListeners(table *tview.Table, app *tview.Application, previousView tview.Primitive) {
+func addTableListeners(table *tview.Table, app Application, previousView tview.Primitive) {
 	table.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		switch event.Key() {
 		case tcell.KeyEnter:

@@ -3,7 +3,6 @@ package client
 import (
 	"fmt"
 
-	"github.com/rivo/tview"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/encoding/gzip"
@@ -15,7 +14,7 @@ import (
 	pb "github.com/Stern-Ritter/gophkeeper/proto/gen/gophkeeper/gophkeeperapi/v1"
 )
 
-func Run(client service.Client, cfg *config.ClientConfig, logger *logger.ClientLogger) error {
+func Run(client service.Client, app service.Application, cfg *config.ClientConfig, logger *logger.ClientLogger) error {
 	opts := make([]grpc.DialOption, 0)
 	opts = append(opts, grpc.WithDefaultCallOptions(grpc.UseCompressor(gzip.Name)))
 	opts = append(opts, grpc.WithUnaryInterceptor(client.AuthInterceptor))
@@ -38,7 +37,6 @@ func Run(client service.Client, cfg *config.ClientConfig, logger *logger.ClientL
 	cardService := service.NewCardService(pb.NewCardServiceV1Client(conn))
 	textService := service.NewTextService(pb.NewTextServiceV1Client(conn))
 	fileService := service.NewFileService(pb.NewFileServiceV1Client(conn))
-	app := tview.NewApplication()
 
 	client.SetAuthService(authService)
 	client.SetAccountService(accountService)

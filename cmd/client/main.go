@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	"github.com/rivo/tview"
 	"go.uber.org/zap"
 
 	app "github.com/Stern-Ritter/gophkeeper/internal/app/client"
@@ -23,14 +24,15 @@ func main() {
 		BuildDate:    buildDate,
 	}
 
-	logger, err := logger.Initialize(cfg.LoggerLvl)
+	l, err := logger.Initialize(cfg.LoggerLvl)
 	if err != nil {
 		log.Fatalf("%+v", err)
 	}
 
-	client := service.NewClient(&cfg)
-	err = app.Run(client, &cfg, logger)
+	c := service.NewClient(&cfg)
+	a := tview.NewApplication()
+	err = app.Run(c, a, &cfg, l)
 	if err != nil {
-		logger.Fatal(err.Error(), zap.String("event", "start application"))
+		l.Fatal(err.Error(), zap.String("event", "start application"))
 	}
 }

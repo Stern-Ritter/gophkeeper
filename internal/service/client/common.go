@@ -25,7 +25,7 @@ func (c *ClientImpl) QueueUpdateDraw(render func()) {
 
 // selectView sets the given view as the root of the application and focuses on it.
 // This function is useful for switching between different views in application.
-func selectView(app *tview.Application, view tview.Primitive) {
+func selectView(app Application, view tview.Primitive) {
 	app.SetRoot(view, true).SetFocus(view)
 }
 
@@ -59,7 +59,7 @@ func newClickableCell(text string, handler func()) *tview.TableCell {
 }
 
 // stopApp stops the tview application.
-func stopApp(app *tview.Application) {
+func stopApp(app Application) {
 	app.Stop()
 }
 

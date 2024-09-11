@@ -9,6 +9,14 @@ import (
 	config "github.com/Stern-Ritter/gophkeeper/internal/config/client"
 )
 
+type Application interface {
+	Run() error
+	Stop()
+	SetRoot(root tview.Primitive, fullscreen bool) *tview.Application
+	Draw() *tview.Application
+	QueueUpdateDraw(f func()) *tview.Application
+}
+
 // Client represents a client in the TUI application, managing services and the application.
 // It holds references to services for authentication, account management, card management, text management,
 // file management, and the TUI application instance.
@@ -18,7 +26,7 @@ type Client interface {
 	SetCardService(cardService CardService)
 	SetTextService(textService TextService)
 	SetFileService(fileService FileService)
-	SetApp(app *tview.Application)
+	SetApp(app Application)
 	AuthInterceptor(ctx context.Context, method string, req interface{}, reply interface{}, cc *grpc.ClientConn,
 		invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error
 	AuthStreamInterceptor(ctx context.Context, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string,
@@ -50,7 +58,7 @@ type ClientImpl struct {
 	cardService    CardService
 	textService    TextService
 	fileService    FileService
-	app            *tview.Application
+	app            Application
 	authToken      string
 	config         *config.ClientConfig
 }
@@ -81,6 +89,6 @@ func (c *ClientImpl) SetFileService(fileService FileService) {
 	c.fileService = fileService
 }
 
-func (c *ClientImpl) SetApp(app *tview.Application) {
+func (c *ClientImpl) SetApp(app Application) {
 	c.app = app
 }

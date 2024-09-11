@@ -18,6 +18,85 @@ import (
 	grpc "google.golang.org/grpc"
 )
 
+// MockApplication is a mock of Application interface.
+type MockApplication struct {
+	ctrl     *gomock.Controller
+	recorder *MockApplicationMockRecorder
+}
+
+// MockApplicationMockRecorder is the mock recorder for MockApplication.
+type MockApplicationMockRecorder struct {
+	mock *MockApplication
+}
+
+// NewMockApplication creates a new mock instance.
+func NewMockApplication(ctrl *gomock.Controller) *MockApplication {
+	mock := &MockApplication{ctrl: ctrl}
+	mock.recorder = &MockApplicationMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockApplication) EXPECT() *MockApplicationMockRecorder {
+	return m.recorder
+}
+
+// Draw mocks base method.
+func (m *MockApplication) Draw() *tview.Application {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Draw")
+	ret0, _ := ret[0].(*tview.Application)
+	return ret0
+}
+
+// Draw indicates an expected call of Draw.
+func (mr *MockApplicationMockRecorder) Draw() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Draw", reflect.TypeOf((*MockApplication)(nil).Draw))
+}
+
+// QueueUpdateDraw mocks base method.
+func (m *MockApplication) QueueUpdateDraw(f func()) *tview.Application {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "QueueUpdateDraw", f)
+	ret0, _ := ret[0].(*tview.Application)
+	return ret0
+}
+
+// QueueUpdateDraw indicates an expected call of QueueUpdateDraw.
+func (mr *MockApplicationMockRecorder) QueueUpdateDraw(f any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "QueueUpdateDraw", reflect.TypeOf((*MockApplication)(nil).QueueUpdateDraw), f)
+}
+
+// Run mocks base method.
+func (m *MockApplication) Run() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Run")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Run indicates an expected call of Run.
+func (mr *MockApplicationMockRecorder) Run() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Run", reflect.TypeOf((*MockApplication)(nil).Run))
+}
+
+// SetRoot mocks base method.
+func (m *MockApplication) SetRoot(root tview.Primitive, fullscreen bool) *tview.Application {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetRoot", root, fullscreen)
+	ret0, _ := ret[0].(*tview.Application)
+	return ret0
+}
+
+// SetRoot indicates an expected call of SetRoot.
+func (mr *MockApplicationMockRecorder) SetRoot(root, fullscreen any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetRoot", reflect.TypeOf((*MockApplication)(nil).SetRoot), root, fullscreen)
+}
+
 // MockClient is a mock of Client interface.
 type MockClient struct {
 	ctrl     *gomock.Controller
@@ -271,7 +350,7 @@ func (mr *MockClientMockRecorder) SetAccountService(accountService any) *gomock.
 }
 
 // SetApp mocks base method.
-func (m *MockClient) SetApp(app *tview.Application) {
+func (m *MockClient) SetApp(app Application) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "SetApp", app)
 }
