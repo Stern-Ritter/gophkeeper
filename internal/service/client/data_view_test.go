@@ -7,6 +7,8 @@ import (
 	"github.com/rivo/tview"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	config "github.com/Stern-Ritter/gophkeeper/internal/config/client"
 	pb "github.com/Stern-Ritter/gophkeeper/proto/gen/gophkeeper/gophkeeperapi/v1"
@@ -127,6 +129,26 @@ func TestDeleteAccountHandler_Error(t *testing.T) {
 	deleteAccountHandler(mockClient, mockAccountService, "1", currentView, previousView)
 }
 
+func TestDeleteAccountHandler_GRPCError(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockClient := NewMockClient(ctrl)
+	mockAccountService := NewMockAccountService(ctrl)
+
+	currentView := tview.NewBox()
+	previousView := tview.NewBox()
+
+	mockClient.EXPECT().ShowConfirmModal("Are you sure you want to delete this account data?", currentView, gomock.Any()).
+		Do(func(title string, view tview.Primitive, onConfirm func()) { onConfirm() })
+
+	grpcErr := status.Error(codes.Internal, "internal server error")
+	mockAccountService.EXPECT().DeleteAccount("1").Return(grpcErr)
+	mockClient.EXPECT().ShowInfoModal("Failed to delete account data: internal server error", currentView).Times(1)
+
+	deleteAccountHandler(mockClient, mockAccountService, "1", currentView, previousView)
+}
+
 func TestCardsView(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
@@ -224,6 +246,26 @@ func TestDeleteCardHandler_Error(t *testing.T) {
 	deleteCardHandler(mockClient, mockCardService, "1", currentView, previousView)
 }
 
+func TestDeleteCardHandler_GRPCError(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockClient := NewMockClient(ctrl)
+	mockCardService := NewMockCardService(ctrl)
+
+	currentView := tview.NewBox()
+	previousView := tview.NewBox()
+
+	mockClient.EXPECT().ShowConfirmModal("Are you sure you want to delete this card data?", currentView, gomock.Any()).
+		Do(func(title string, view tview.Primitive, onConfirm func()) { onConfirm() })
+
+	grpcErr := status.Error(codes.Internal, "internal server error")
+	mockCardService.EXPECT().DeleteCard("1").Return(grpcErr)
+	mockClient.EXPECT().ShowInfoModal("Failed to delete card data: internal server error", currentView).Times(1)
+
+	deleteCardHandler(mockClient, mockCardService, "1", currentView, previousView)
+}
+
 func TestTextsView(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
@@ -301,6 +343,26 @@ func TestDeleteTextHandler_Error(t *testing.T) {
 	err := errors.New("failed to delete text")
 	mockTextService.EXPECT().DeleteText("1").Return(err)
 	mockClient.EXPECT().ShowInfoModal("Failed to delete text data: failed to delete text", currentView).Times(1)
+
+	deleteTextHandler(mockClient, mockTextService, "1", currentView, previousView)
+}
+
+func TestDeleteTextHandler_GRPCError(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockClient := NewMockClient(ctrl)
+	mockTextService := NewMockTextService(ctrl)
+
+	currentView := tview.NewBox()
+	previousView := tview.NewBox()
+
+	mockClient.EXPECT().ShowConfirmModal("Are you sure you want to delete this text data?", currentView, gomock.Any()).
+		Do(func(title string, view tview.Primitive, onConfirm func()) { onConfirm() })
+
+	grpcErr := status.Error(codes.Internal, "internal server error")
+	mockTextService.EXPECT().DeleteText("1").Return(grpcErr)
+	mockClient.EXPECT().ShowInfoModal("Failed to delete text data: internal server error", currentView).Times(1)
 
 	deleteTextHandler(mockClient, mockTextService, "1", currentView, previousView)
 }
@@ -395,6 +457,26 @@ func TestDeleteFileHandler_Error(t *testing.T) {
 	deleteFileHandler(mockClient, mockFileService, "1", currentView, previousView)
 }
 
+func TestDeleteFileHandler_GRPCError(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockClient := NewMockClient(ctrl)
+	mockFileService := NewMockFileService(ctrl)
+
+	currentView := tview.NewBox()
+	previousView := tview.NewBox()
+
+	mockClient.EXPECT().ShowConfirmModal("Are you sure you want to delete this file?", currentView, gomock.Any()).
+		Do(func(title string, view tview.Primitive, onConfirm func()) { onConfirm() })
+
+	grpcErr := status.Error(codes.Internal, "internal server error")
+	mockFileService.EXPECT().DeleteFile("1").Return(grpcErr)
+	mockClient.EXPECT().ShowInfoModal("Failed to delete file: internal server error", currentView).Times(1)
+
+	deleteFileHandler(mockClient, mockFileService, "1", currentView, previousView)
+}
+
 func TestDownloadFile_Success(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
@@ -423,6 +505,24 @@ func TestDownloadFile_Error(t *testing.T) {
 
 	err := errors.New("failed to download file")
 	mockFileService.EXPECT().DownloadFile(gomock.Any(), "1", "/path", gomock.Any()).Return(err)
+
+	mockClient.EXPECT().SelectView(gomock.Any()).Times(1)
+	mockClient.EXPECT().QueueUpdateDraw(gomock.Any()).AnyTimes()
+
+	downloadFile(mockClient, mockFileService, "1", "/path", currentView)
+}
+
+func TestDownloadFile_GRPCError(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockClient := NewMockClient(ctrl)
+	mockFileService := NewMockFileService(ctrl)
+
+	currentView := tview.NewBox()
+
+	grpcErr := status.Error(codes.Internal, "internal server error")
+	mockFileService.EXPECT().DownloadFile(gomock.Any(), "1", "/path", gomock.Any()).Return(grpcErr)
 
 	mockClient.EXPECT().SelectView(gomock.Any()).Times(1)
 	mockClient.EXPECT().QueueUpdateDraw(gomock.Any()).AnyTimes()

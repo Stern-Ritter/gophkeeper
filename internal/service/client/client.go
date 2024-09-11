@@ -27,6 +27,12 @@ type Client interface {
 	SetTextService(textService TextService)
 	SetFileService(fileService FileService)
 	SetApp(app Application)
+	GetAuthService() AuthService
+	GetAccountService() AccountService
+	GetCardService() CardService
+	GetTextService() TextService
+	GetFileService() FileService
+	GetApp() Application
 	AuthInterceptor(ctx context.Context, method string, req interface{}, reply interface{}, cc *grpc.ClientConn,
 		invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error
 	AuthStreamInterceptor(ctx context.Context, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string,
@@ -91,4 +97,28 @@ func (c *ClientImpl) SetFileService(fileService FileService) {
 
 func (c *ClientImpl) SetApp(app Application) {
 	c.app = app
+}
+
+func (c *ClientImpl) GetAuthService() AuthService {
+	return c.authService
+}
+
+func (c *ClientImpl) GetAccountService() AccountService {
+	return c.accountService
+}
+
+func (c *ClientImpl) GetCardService() CardService {
+	return c.cardService
+}
+
+func (c *ClientImpl) GetTextService() TextService {
+	return c.textService
+}
+
+func (c *ClientImpl) GetFileService() FileService {
+	return c.fileService
+}
+
+func (c *ClientImpl) GetApp() Application {
+	return c.app
 }

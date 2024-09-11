@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"crypto/rand"
+	"crypto/rsa"
 	"testing"
 	"time"
 
@@ -67,7 +69,7 @@ func TestNewToken(t *testing.T) {
 	assert.Equal(t, user.Login, claims["login"], "login in claims does not match")
 }
 
-func TestValidateToken(t *testing.T) {
+func TestValidateToken_ValidToken(t *testing.T) {
 	secret := "secret"
 	user := model.User{
 		ID:    "42",
@@ -82,20 +84,59 @@ func TestValidateToken(t *testing.T) {
 	parsedToken, err := ValidateToken(token, secret)
 	assert.NoError(t, err, "unexpected error validating token")
 	assert.NotNil(t, parsedToken, "expected non-nil token after validation")
+}
 
-	expiredToken := "invalid token"
+func TestValidateToken_InvalidSigningMethod(t *testing.T) {
+	secret := "secret"
+	user := model.User{
+		ID:    "42",
+		Login: "test user",
+	}
+	duration := time.Hour
 
-	parsedToken, err = ValidateToken(expiredToken, secret)
-	assert.Error(t, err, "expected error for invalid token")
-	assert.Nil(t, parsedToken, "expected nil token after validation")
+	privateKey, err := generateRSAKey()
+	require.NoError(t, err, "unexpected error generating RSA key")
 
-	invalidToken, err := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+	invalidSigningMethodToken, err := generateRSAToken(privateKey, jwt.MapClaims{
 		"uid":   user.ID,
 		"login": user.Login,
-		"exp":   time.Now().Add(-time.Hour).Unix(),
-	}).SignedString([]byte("wrong secret"))
-	require.NoError(t, err, "unexpected error generating invalid token")
+		"exp":   time.Now().Add(duration).Unix(),
+	})
+	require.NoError(t, err, "unexpected error generating invalid signing method token")
 
-	_, err = ValidateToken(invalidToken, secret)
-	assert.Error(t, err, "expected error for token with wrong signature")
+	token, err := ValidateToken(invalidSigningMethodToken, secret)
+	assert.Error(t, err, "expected error for token with unexpected signing method")
+	assert.Empty(t, token, "expected empty token for invalid signing method")
+}
+
+func TestValidateToken_MalformedToken(t *testing.T) {
+	secret := "secret"
+	malformedToken := "not token"
+
+	_, err := ValidateToken(malformedToken, secret)
+	assert.Error(t, err, "expected error for malformed token")
+}
+
+func TestValidateExpiredToken(t *testing.T) {
+	secret := "secret"
+	user := model.User{
+		ID:    "42",
+		Login: "test user",
+	}
+	duration := -time.Hour
+
+	expiredToken, err := NewToken(user, secret, duration)
+	require.NoError(t, err, "unexpected error generating expired token")
+
+	_, err = ValidateToken(expiredToken, secret)
+	assert.Error(t, err, "expected error for expired token")
+}
+
+func generateRSAKey() (*rsa.PrivateKey, error) {
+	return rsa.GenerateKey(rand.Reader, 2048)
+}
+
+func generateRSAToken(privateKey *rsa.PrivateKey, claims jwt.MapClaims) (string, error) {
+	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
+	return token.SignedString(privateKey)
 }

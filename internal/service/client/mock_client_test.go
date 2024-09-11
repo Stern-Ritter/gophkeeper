@@ -97,6 +97,18 @@ func (mr *MockApplicationMockRecorder) SetRoot(root, fullscreen any) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetRoot", reflect.TypeOf((*MockApplication)(nil).SetRoot), root, fullscreen)
 }
 
+// Stop mocks base method.
+func (m *MockApplication) Stop() {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "Stop")
+}
+
+// Stop indicates an expected call of Stop.
+func (mr *MockApplicationMockRecorder) Stop() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Stop", reflect.TypeOf((*MockApplication)(nil).Stop))
+}
+
 // MockClient is a mock of Client interface.
 type MockClient struct {
 	ctrl     *gomock.Controller
@@ -297,6 +309,90 @@ func (m *MockClient) FilesView(previousView tview.Primitive) tview.Primitive {
 func (mr *MockClientMockRecorder) FilesView(previousView any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FilesView", reflect.TypeOf((*MockClient)(nil).FilesView), previousView)
+}
+
+// GetAccountService mocks base method.
+func (m *MockClient) GetAccountService() AccountService {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAccountService")
+	ret0, _ := ret[0].(AccountService)
+	return ret0
+}
+
+// GetAccountService indicates an expected call of GetAccountService.
+func (mr *MockClientMockRecorder) GetAccountService() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAccountService", reflect.TypeOf((*MockClient)(nil).GetAccountService))
+}
+
+// GetApp mocks base method.
+func (m *MockClient) GetApp() Application {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetApp")
+	ret0, _ := ret[0].(Application)
+	return ret0
+}
+
+// GetApp indicates an expected call of GetApp.
+func (mr *MockClientMockRecorder) GetApp() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetApp", reflect.TypeOf((*MockClient)(nil).GetApp))
+}
+
+// GetAuthService mocks base method.
+func (m *MockClient) GetAuthService() AuthService {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAuthService")
+	ret0, _ := ret[0].(AuthService)
+	return ret0
+}
+
+// GetAuthService indicates an expected call of GetAuthService.
+func (mr *MockClientMockRecorder) GetAuthService() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAuthService", reflect.TypeOf((*MockClient)(nil).GetAuthService))
+}
+
+// GetCardService mocks base method.
+func (m *MockClient) GetCardService() CardService {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCardService")
+	ret0, _ := ret[0].(CardService)
+	return ret0
+}
+
+// GetCardService indicates an expected call of GetCardService.
+func (mr *MockClientMockRecorder) GetCardService() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCardService", reflect.TypeOf((*MockClient)(nil).GetCardService))
+}
+
+// GetFileService mocks base method.
+func (m *MockClient) GetFileService() FileService {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetFileService")
+	ret0, _ := ret[0].(FileService)
+	return ret0
+}
+
+// GetFileService indicates an expected call of GetFileService.
+func (mr *MockClientMockRecorder) GetFileService() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFileService", reflect.TypeOf((*MockClient)(nil).GetFileService))
+}
+
+// GetTextService mocks base method.
+func (m *MockClient) GetTextService() TextService {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetTextService")
+	ret0, _ := ret[0].(TextService)
+	return ret0
+}
+
+// GetTextService indicates an expected call of GetTextService.
+func (mr *MockClientMockRecorder) GetTextService() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTextService", reflect.TypeOf((*MockClient)(nil).GetTextService))
 }
 
 // MainView mocks base method.

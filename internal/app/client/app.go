@@ -47,7 +47,7 @@ func Run(client service.Client, app service.Application, cfg *config.ClientConfi
 
 	client.AuthView()
 	if err := app.Run(); err != nil {
-		logger.Fatal(fmt.Sprintf("Failed to run application: %s", cfg.ServerURL),
+		logger.Error(fmt.Sprintf("Failed to run application: %s", cfg.ServerURL),
 			zap.String("event", "run application"), zap.Error(err))
 		return err
 	}
