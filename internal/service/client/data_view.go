@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
@@ -54,7 +55,9 @@ func (c *ClientImpl) AccountsView(previousView tview.Primitive) tview.Primitive 
 		table.SetCell(row, column(), tview.NewTableCell(account.Login))
 		table.SetCell(row, column(), tview.NewTableCell(account.Password))
 		table.SetCell(row, column(), tview.NewTableCell(account.Comment))
-		table.SetCell(row, column(), newClickableCell(deleteBtnText, func() { c.deleteAccountHandler(account.Id, table, previousView) }))
+		table.SetCell(row, column(), newClickableCell(deleteBtnText, func() {
+			deleteAccountHandler(c, c.accountService, account.Id, table, previousView)
+		}))
 	}
 
 	selectView(c.app, table)
@@ -64,17 +67,20 @@ func (c *ClientImpl) AccountsView(previousView tview.Primitive) tview.Primitive 
 
 // deleteAccountHandler handles the deletion of account data.
 // It shows a confirmation modal and deletes the account if confirmed.
-func (c *ClientImpl) deleteAccountHandler(accountID string, currentView tview.Primitive, previousView tview.Primitive) {
+func deleteAccountHandler(c Client, accountService AccountService, accountID string, currentView tview.Primitive,
+	previousView tview.Primitive) {
 	c.ShowConfirmModal("Are you sure you want to delete this account data?", currentView,
 		func() {
-			err := c.accountService.DeleteAccount(accountID)
+			err := accountService.DeleteAccount(accountID)
 			if err != nil {
 				st, ok := status.FromError(err)
 				if !ok {
 					c.ShowInfoModal(fmt.Sprintf("Failed to delete account data: %s", err.Error()), currentView)
+					return
 				} else {
 					errMsg := st.Message()
 					c.ShowInfoModal(fmt.Sprintf("Failed to delete account data: %s", errMsg), currentView)
+					return
 				}
 			}
 			c.ShowInfoModal("Account data deleted successfully", currentView)
@@ -102,7 +108,9 @@ func (c *ClientImpl) CardsView(previousView tview.Primitive) tview.Primitive {
 		table.SetCell(row, column(), tview.NewTableCell(card.Cvc))
 		table.SetCell(row, column(), tview.NewTableCell(card.Pin))
 		table.SetCell(row, column(), tview.NewTableCell(card.Comment))
-		table.SetCell(row, column(), newClickableCell(deleteBtnText, func() { c.deleteCardHandler(card.Id, table, previousView) }))
+		table.SetCell(row, column(), newClickableCell(deleteBtnText, func() {
+			deleteCardHandler(c, c.cardService, card.Id, table, previousView)
+		}))
 	}
 
 	selectView(c.app, table)
@@ -112,17 +120,20 @@ func (c *ClientImpl) CardsView(previousView tview.Primitive) tview.Primitive {
 
 // deleteCardHandler handles the deletion of card data.
 // It shows a confirmation modal and deletes the card if confirmed.
-func (c *ClientImpl) deleteCardHandler(cardID string, currentView tview.Primitive, previousView tview.Primitive) {
+func deleteCardHandler(c Client, cardService CardService, cardID string, currentView tview.Primitive,
+	previousView tview.Primitive) {
 	c.ShowConfirmModal("Are you sure you want to delete this card data?", currentView,
 		func() {
-			err := c.cardService.DeleteCard(cardID)
+			err := cardService.DeleteCard(cardID)
 			if err != nil {
 				st, ok := status.FromError(err)
 				if !ok {
 					c.ShowInfoModal(fmt.Sprintf("Failed to delete card data: %s", err.Error()), currentView)
+					return
 				} else {
 					errMsg := st.Message()
 					c.ShowInfoModal(fmt.Sprintf("Failed to delete card data: %s", errMsg), currentView)
+					return
 				}
 			}
 			c.ShowInfoModal("Card data deleted successfully", currentView)
@@ -146,7 +157,9 @@ func (c *ClientImpl) TextsView(previousView tview.Primitive) tview.Primitive {
 		column := getColumnCounter()
 		table.SetCell(row, column(), tview.NewTableCell(text.Text))
 		table.SetCell(row, column(), tview.NewTableCell(text.Comment))
-		table.SetCell(row, column(), newClickableCell(deleteBtnText, func() { c.deleteTextHandler(text.Id, table, previousView) }))
+		table.SetCell(row, column(), newClickableCell(deleteBtnText, func() {
+			deleteTextHandler(c, c.textService, text.Id, table, previousView)
+		}))
 	}
 
 	selectView(c.app, table)
@@ -156,17 +169,20 @@ func (c *ClientImpl) TextsView(previousView tview.Primitive) tview.Primitive {
 
 // deleteTextHandler handles the deletion of text data.
 // It shows a confirmation modal and deletes the text if confirmed.
-func (c *ClientImpl) deleteTextHandler(textID string, currentView tview.Primitive, previousView tview.Primitive) {
+func deleteTextHandler(c Client, textService TextService, textID string, currentView tview.Primitive,
+	previousView tview.Primitive) {
 	c.ShowConfirmModal("Are you sure you want to delete this text data?", currentView,
 		func() {
-			err := c.textService.DeleteText(textID)
+			err := textService.DeleteText(textID)
 			if err != nil {
 				st, ok := status.FromError(err)
 				if !ok {
 					c.ShowInfoModal(fmt.Sprintf("Failed to delete text data: %s", err.Error()), currentView)
+					return
 				} else {
 					errMsg := st.Message()
 					c.ShowInfoModal(fmt.Sprintf("Failed to delete text data: %s", errMsg), currentView)
+					return
 				}
 			}
 			c.ShowInfoModal("Text data deleted successfully", currentView)
@@ -191,8 +207,10 @@ func (c *ClientImpl) FilesView(previousView tview.Primitive) tview.Primitive {
 		table.SetCell(row, column(), tview.NewTableCell(file.Name))
 		table.SetCell(row, column(), tview.NewTableCell(utils.FormatBytes(file.Size)))
 		table.SetCell(row, column(), tview.NewTableCell(file.Comment))
-		table.SetCell(row, column(), newClickableCell(downloadBtnText, func() { c.downloadFileHandler(file.Id, table) }))
-		table.SetCell(row, column(), newClickableCell(deleteBtnText, func() { c.deleteFileHandler(file.Id, table, previousView) }))
+		table.SetCell(row, column(), newClickableCell(downloadBtnText, func() { downloadFileHandler(c, c.fileService, file.Id, table) }))
+		table.SetCell(row, column(), newClickableCell(deleteBtnText, func() {
+			deleteFileHandler(c, c.fileService, file.Id, table, previousView)
+		}))
 	}
 
 	selectView(c.app, table)
@@ -201,17 +219,20 @@ func (c *ClientImpl) FilesView(previousView tview.Primitive) tview.Primitive {
 }
 
 // deleteFileHandler handles the deletion of a file. It shows a confirmation modal and deletes the file if confirmed.
-func (c *ClientImpl) deleteFileHandler(fileID string, currentView tview.Primitive, previousView tview.Primitive) {
+func deleteFileHandler(c Client, fileService FileService, fileID string, currentView tview.Primitive,
+	previousView tview.Primitive) {
 	c.ShowConfirmModal("Are you sure you want to delete this file?", currentView,
 		func() {
-			err := c.fileService.DeleteFile(fileID)
+			err := fileService.DeleteFile(fileID)
 			if err != nil {
 				st, ok := status.FromError(err)
 				if !ok {
 					c.ShowInfoModal(fmt.Sprintf("Failed to delete file: %s", err.Error()), currentView)
+					return
 				} else {
 					errMsg := st.Message()
 					c.ShowInfoModal(fmt.Sprintf("Failed to delete file: %s", errMsg), currentView)
+					return
 				}
 			}
 			c.ShowInfoModal("File deleted successfully", currentView)
@@ -221,28 +242,28 @@ func (c *ClientImpl) deleteFileHandler(fileID string, currentView tview.Primitiv
 
 // downloadFileHandler displays a form for entering the directory path to download a file.
 // It starts the download when the "Download" button is clicked.
-func (c *ClientImpl) downloadFileHandler(fileID string, currentView tview.Primitive) {
+func downloadFileHandler(c Client, fileService FileService, fileID string, currentView tview.Primitive) {
 	form := tview.NewForm()
 	form.AddInputField("Directory path", "", 40, nil, nil).
 		AddButton("Download", func() {
 			dirPath := form.GetFormItemByLabel("Directory path").(*tview.InputField).GetText()
-			c.downloadFile(fileID, dirPath, currentView)
+			downloadFile(c, fileService, fileID, dirPath, currentView)
 		}).
-		AddButton("Cancel", func() { selectView(c.app, currentView) })
+		AddButton("Cancel", func() { c.SelectView(currentView) })
 
-	selectView(c.app, form)
+	c.SelectView(form)
 }
 
 // downloadFile initiates the download of a file and displays a progress indicator.
 // It uses a context to manage cancellation and provides a progress view with a modal dialog.
 // The progress is shown as a percentage, and the user can cancel the download.
 // Once the download is complete, a message indicating success or failure is displayed.
-func (c *ClientImpl) downloadFile(fileID string, dirPath string, currentView tview.Primitive) {
+func downloadFile(c Client, fileService FileService, fileID string, dirPath string, currentView tview.Primitive) {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	progressText := tview.NewTextView().
 		SetText("Downloading... 0%").
-		SetChangedFunc(func() { c.app.Draw() })
+		SetChangedFunc(func() { c.UpdateDraw() })
 
 	flex := tview.NewFlex().
 		SetDirection(tview.FlexRow).
@@ -255,7 +276,7 @@ func (c *ClientImpl) downloadFile(fileID string, dirPath string, currentView tvi
 		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 			if buttonLabel == "Cancel" {
 				cancel()
-				selectView(c.app, currentView)
+				c.SelectView(currentView)
 			}
 		})
 
@@ -263,12 +284,17 @@ func (c *ClientImpl) downloadFile(fileID string, dirPath string, currentView tvi
 		AddPage("flex", flex, true, true).
 		AddPage("modal", modal, true, true)
 
+	var wg sync.WaitGroup
+	wg.Add(1)
+
 	go func() {
-		err := c.fileService.DownloadFile(ctx, fileID, dirPath, func(progress float64) {
-			c.app.QueueUpdateDraw(func() { progressText.SetText(fmt.Sprintf("Downloading... %.2f%%", progress)) })
+		defer wg.Done()
+
+		err := fileService.DownloadFile(ctx, fileID, dirPath, func(progress float64) {
+			c.QueueUpdateDraw(func() { progressText.SetText(fmt.Sprintf("Downloading... %.2f%%", progress)) })
 		})
 		if err != nil {
-			c.app.QueueUpdateDraw(func() {
+			c.QueueUpdateDraw(func() {
 				st, ok := status.FromError(err)
 				if !ok {
 					c.ShowInfoModal(fmt.Sprintf("Failed to download file: %s", err.Error()), currentView)
@@ -278,11 +304,12 @@ func (c *ClientImpl) downloadFile(fileID string, dirPath string, currentView tvi
 				}
 			})
 		} else {
-			c.app.QueueUpdateDraw(func() { c.ShowInfoModal("File downloaded successfully", currentView) })
+			c.QueueUpdateDraw(func() { c.ShowInfoModal("File downloaded successfully", currentView) })
 		}
 	}()
 
-	selectView(c.app, pages)
+	c.SelectView(pages)
+	wg.Wait()
 }
 
 // addTableListeners sets up listeners for a table.

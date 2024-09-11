@@ -23,6 +23,9 @@ type Client interface {
 		invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error
 	AuthStreamInterceptor(ctx context.Context, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string,
 		streamer grpc.Streamer, opts ...grpc.CallOption) (grpc.ClientStream, error)
+	SelectView(view tview.Primitive)
+	UpdateDraw()
+	QueueUpdateDraw(render func())
 	AuthView() tview.Primitive
 	MainView() tview.Primitive
 	AddView() tview.Primitive

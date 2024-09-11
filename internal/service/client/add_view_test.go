@@ -1,10 +1,12 @@
 package client
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/rivo/tview"
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/mock/gomock"
 
 	config "github.com/Stern-Ritter/gophkeeper/internal/config/client"
 )
@@ -67,6 +69,53 @@ func TestAddAccountView(t *testing.T) {
 	assert.Equal(t, "Cancel", cancelButton.GetLabel(), "Second button should be 'Cancel'")
 }
 
+func TestAddAccountHandler_Success(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockClient := NewMockClient(ctrl)
+	mockAccountService := NewMockAccountService(ctrl)
+
+	form := tview.NewForm()
+	form.AddInputField("Login", "", 20, nil, nil)
+	form.AddInputField("Password", "", 20, nil, nil)
+	form.AddInputField("Comment", "", 20, nil, nil)
+
+	form.GetFormItemByLabel("Login").(*tview.InputField).SetText("user")
+	form.GetFormItemByLabel("Password").(*tview.InputField).SetText("password")
+	form.GetFormItemByLabel("Comment").(*tview.InputField).SetText("comment")
+
+	mockAccountService.EXPECT().CreateAccount("user", "password", "comment").Return(nil)
+	mockClient.EXPECT().ShowInfoModal("Success added account data", gomock.Any()).Times(1)
+	mockClient.EXPECT().AddAccountView().Times(1)
+
+	addAccountHandler(mockClient, mockAccountService, form)
+}
+
+func TestAddAccountHandler_Error(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockClient := NewMockClient(ctrl)
+	mockAccountService := NewMockAccountService(ctrl)
+
+	form := tview.NewForm()
+	form.AddInputField("Login", "", 20, nil, nil)
+	form.AddInputField("Password", "", 20, nil, nil)
+	form.AddInputField("Comment", "", 20, nil, nil)
+
+	form.GetFormItemByLabel("Login").(*tview.InputField).SetText("user")
+	form.GetFormItemByLabel("Password").(*tview.InputField).SetText("password")
+	form.GetFormItemByLabel("Comment").(*tview.InputField).SetText("comment")
+
+	err := errors.New("failed to create account")
+
+	mockAccountService.EXPECT().CreateAccount("user", "password", "comment").Return(err)
+	mockClient.EXPECT().ShowInfoModal("Error adding account data: failed to create account", gomock.Any()).Times(1)
+
+	addAccountHandler(mockClient, mockAccountService, form)
+}
+
 func TestAddCardView(t *testing.T) {
 	app := tview.NewApplication()
 
@@ -104,6 +153,67 @@ func TestAddCardView(t *testing.T) {
 	assert.Equal(t, "Cancel", cancelButton.GetLabel(), "Second button should be 'Cancel'")
 }
 
+func TestAddCardHandler_Success(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockClient := NewMockClient(ctrl)
+	mockCardService := NewMockCardService(ctrl)
+
+	form := tview.NewForm()
+	form.AddInputField("Number", "", 20, nil, nil)
+	form.AddInputField("Owner", "", 20, nil, nil)
+	form.AddInputField("Expiry", "", 20, nil, nil)
+	form.AddInputField("CVC", "", 20, nil, nil)
+	form.AddInputField("PIN", "", 20, nil, nil)
+	form.AddInputField("Comment", "", 20, nil, nil)
+
+	form.GetFormItemByLabel("Number").(*tview.InputField).SetText("1234 1234 1234 1234")
+	form.GetFormItemByLabel("Owner").(*tview.InputField).SetText("John Doe")
+	form.GetFormItemByLabel("Expiry").(*tview.InputField).SetText("12/25")
+	form.GetFormItemByLabel("CVC").(*tview.InputField).SetText("123")
+	form.GetFormItemByLabel("PIN").(*tview.InputField).SetText("0000")
+	form.GetFormItemByLabel("Comment").(*tview.InputField).SetText("Debit bank card")
+
+	mockCardService.EXPECT().CreateCard("1234 1234 1234 1234", "John Doe", "12/25", "123",
+		"0000", "Debit bank card").Return(nil)
+	mockClient.EXPECT().ShowInfoModal("Success added card data", gomock.Any()).Times(1)
+	mockClient.EXPECT().AddCardView().Times(1)
+
+	addCardHandler(mockClient, mockCardService, form)
+}
+
+func TestAddCardHandler_Error(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockClient := NewMockClient(ctrl)
+	mockCardService := NewMockCardService(ctrl)
+
+	form := tview.NewForm()
+	form.AddInputField("Number", "", 20, nil, nil)
+	form.AddInputField("Owner", "", 20, nil, nil)
+	form.AddInputField("Expiry", "", 20, nil, nil)
+	form.AddInputField("CVC", "", 20, nil, nil)
+	form.AddInputField("PIN", "", 20, nil, nil)
+	form.AddInputField("Comment", "", 20, nil, nil)
+
+	form.GetFormItemByLabel("Number").(*tview.InputField).SetText("1234 1234 1234 1234")
+	form.GetFormItemByLabel("Owner").(*tview.InputField).SetText("John Doe")
+	form.GetFormItemByLabel("Expiry").(*tview.InputField).SetText("12/25")
+	form.GetFormItemByLabel("CVC").(*tview.InputField).SetText("123")
+	form.GetFormItemByLabel("PIN").(*tview.InputField).SetText("0000")
+	form.GetFormItemByLabel("Comment").(*tview.InputField).SetText("Debit bank card")
+
+	err := errors.New("failed to create card")
+
+	mockCardService.EXPECT().CreateCard("1234 1234 1234 1234", "John Doe", "12/25", "123",
+		"0000", "Debit bank card").Return(err)
+	mockClient.EXPECT().ShowInfoModal("Error adding card data: failed to create card", gomock.Any()).Times(1)
+
+	addCardHandler(mockClient, mockCardService, form)
+}
+
 func TestAddTextView(t *testing.T) {
 	app := tview.NewApplication()
 
@@ -129,6 +239,49 @@ func TestAddTextView(t *testing.T) {
 	assert.Equal(t, "Cancel", cancelButton.GetLabel(), "Second button should be 'Cancel'")
 }
 
+func TestAddTextHandler_Success(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockClient := NewMockClient(ctrl)
+	mockTextService := NewMockTextService(ctrl)
+
+	form := tview.NewForm()
+	form.AddInputField("Text", "", 20, nil, nil)
+	form.AddInputField("Comment", "", 20, nil, nil)
+
+	form.GetFormItemByLabel("Text").(*tview.InputField).SetText("text")
+	form.GetFormItemByLabel("Comment").(*tview.InputField).SetText("comment")
+
+	mockTextService.EXPECT().CreateText("text", "comment").Return(nil)
+	mockClient.EXPECT().ShowInfoModal("Success added text data", gomock.Any()).Times(1)
+	mockClient.EXPECT().AddTextView().Times(1)
+
+	addTextHandler(mockClient, mockTextService, form)
+}
+
+func TestAddTextHandler_Error(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockClient := NewMockClient(ctrl)
+	mockTextService := NewMockTextService(ctrl)
+
+	form := tview.NewForm()
+	form.AddInputField("Text", "", 20, nil, nil)
+	form.AddInputField("Comment", "", 20, nil, nil)
+
+	form.GetFormItemByLabel("Text").(*tview.InputField).SetText("text")
+	form.GetFormItemByLabel("Comment").(*tview.InputField).SetText("comment")
+
+	err := errors.New("failed to create text")
+
+	mockTextService.EXPECT().CreateText("text", "comment").Return(err)
+	mockClient.EXPECT().ShowInfoModal("Error adding text data: failed to create text", gomock.Any()).Times(1)
+
+	addTextHandler(mockClient, mockTextService, form)
+}
+
 func TestAddFileView(t *testing.T) {
 	app := tview.NewApplication()
 
@@ -152,4 +305,26 @@ func TestAddFileView(t *testing.T) {
 
 	cancelButton := form.GetButton(1)
 	assert.Equal(t, "Cancel", cancelButton.GetLabel(), "Second button should be 'Cancel'")
+}
+
+func TestUploadFileHandler(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockClient := NewMockClient(ctrl)
+	mockFileService := NewMockFileService(ctrl)
+
+	form := tview.NewForm()
+	form.AddInputField("File path", "", 20, nil, nil)
+	form.AddInputField("Comment", "", 20, nil, nil)
+
+	form.GetFormItemByLabel("File path").(*tview.InputField).SetText("path")
+	form.GetFormItemByLabel("Comment").(*tview.InputField).SetText("comment")
+
+	mockFileService.EXPECT().UploadFile(gomock.Any(), "path", "comment", gomock.Any()).Return(nil)
+
+	mockClient.EXPECT().SelectView(gomock.Any()).Times(1)
+	mockClient.EXPECT().QueueUpdateDraw(gomock.Any()).AnyTimes()
+
+	uploadFileHandler(mockClient, mockFileService, form)
 }

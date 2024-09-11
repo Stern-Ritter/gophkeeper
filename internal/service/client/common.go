@@ -4,6 +4,25 @@ import (
 	"github.com/rivo/tview"
 )
 
+// SelectView sets the given view as the root of the application and focuses on it.
+// This function is useful for switching between different views in application.
+func (c *ClientImpl) SelectView(view tview.Primitive) {
+	selectView(c.app, view)
+}
+
+// UpdateDraw forces the application to redraw its content.
+// This method should be called after updating views or their content
+// to ensure the changes are rendered on the screen.
+func (c *ClientImpl) UpdateDraw() {
+	c.app.Draw()
+}
+
+// QueueUpdateDraw queues a function to update the application's UI.
+// The provided render function will be executed during the next rendering cycle.
+func (c *ClientImpl) QueueUpdateDraw(render func()) {
+	c.app.QueueUpdateDraw(render)
+}
+
 // selectView sets the given view as the root of the application and focuses on it.
 // This function is useful for switching between different views in application.
 func selectView(app *tview.Application, view tview.Primitive) {

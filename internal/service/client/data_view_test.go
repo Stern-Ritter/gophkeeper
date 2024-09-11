@@ -1,6 +1,7 @@
 package client
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/rivo/tview"
@@ -86,6 +87,46 @@ func TestAccountsView(t *testing.T) {
 	assert.Equal(t, deleteBtnText, secondDeleteCell, "Delete button text should match")
 }
 
+func TestDeleteAccountHandler_Success(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockClient := NewMockClient(ctrl)
+	mockAccountService := NewMockAccountService(ctrl)
+
+	currentView := tview.NewBox()
+	previousView := tview.NewBox()
+
+	mockClient.EXPECT().ShowConfirmModal("Are you sure you want to delete this account data?", currentView, gomock.Any()).
+		Do(func(title string, view tview.Primitive, onConfirm func()) { onConfirm() })
+
+	mockAccountService.EXPECT().DeleteAccount("1").Return(nil)
+	mockClient.EXPECT().ShowInfoModal("Account data deleted successfully", currentView).Times(1)
+	mockClient.EXPECT().AccountsView(previousView).Times(1)
+
+	deleteAccountHandler(mockClient, mockAccountService, "1", currentView, previousView)
+}
+
+func TestDeleteAccountHandler_Error(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockClient := NewMockClient(ctrl)
+	mockAccountService := NewMockAccountService(ctrl)
+
+	currentView := tview.NewBox()
+	previousView := tview.NewBox()
+
+	mockClient.EXPECT().ShowConfirmModal("Are you sure you want to delete this account data?", currentView, gomock.Any()).
+		Do(func(title string, view tview.Primitive, onConfirm func()) { onConfirm() })
+
+	err := errors.New("failed to delete account")
+	mockAccountService.EXPECT().DeleteAccount("1").Return(err)
+	mockClient.EXPECT().ShowInfoModal("Failed to delete account data: failed to delete account", currentView).Times(1)
+
+	deleteAccountHandler(mockClient, mockAccountService, "1", currentView, previousView)
+}
+
 func TestCardsView(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
@@ -143,6 +184,46 @@ func TestCardsView(t *testing.T) {
 	assert.Equal(t, deleteBtnText, secondDeleteCell, "Delete button text should match")
 }
 
+func TestDeleteCardHandler_Success(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockClient := NewMockClient(ctrl)
+	mockCardService := NewMockCardService(ctrl)
+
+	currentView := tview.NewBox()
+	previousView := tview.NewBox()
+
+	mockClient.EXPECT().ShowConfirmModal("Are you sure you want to delete this card data?", currentView, gomock.Any()).
+		Do(func(title string, view tview.Primitive, onConfirm func()) { onConfirm() })
+
+	mockCardService.EXPECT().DeleteCard("1").Return(nil)
+	mockClient.EXPECT().ShowInfoModal("Card data deleted successfully", currentView).Times(1)
+	mockClient.EXPECT().CardsView(previousView).Times(1)
+
+	deleteCardHandler(mockClient, mockCardService, "1", currentView, previousView)
+}
+
+func TestDeleteCardHandler_Error(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockClient := NewMockClient(ctrl)
+	mockCardService := NewMockCardService(ctrl)
+
+	currentView := tview.NewBox()
+	previousView := tview.NewBox()
+
+	mockClient.EXPECT().ShowConfirmModal("Are you sure you want to delete this card data?", currentView, gomock.Any()).
+		Do(func(title string, view tview.Primitive, onConfirm func()) { onConfirm() })
+
+	testErr := errors.New("failed to delete card")
+	mockCardService.EXPECT().DeleteCard("1").Return(testErr)
+	mockClient.EXPECT().ShowInfoModal("Failed to delete card data: failed to delete card", currentView).Times(1)
+
+	deleteCardHandler(mockClient, mockCardService, "1", currentView, previousView)
+}
+
 func TestTextsView(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
@@ -182,6 +263,46 @@ func TestTextsView(t *testing.T) {
 	assert.Equal(t, deleteBtnText, firstDeleteCell, "Delete button text should match")
 	secondDeleteCell := table.GetCell(2, 2).Text
 	assert.Equal(t, deleteBtnText, secondDeleteCell, "Delete button text should match")
+}
+
+func TestDeleteTextHandler_Success(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockClient := NewMockClient(ctrl)
+	mockTextService := NewMockTextService(ctrl)
+
+	currentView := tview.NewBox()
+	previousView := tview.NewBox()
+
+	mockClient.EXPECT().ShowConfirmModal("Are you sure you want to delete this text data?", currentView, gomock.Any()).
+		Do(func(title string, view tview.Primitive, onConfirm func()) { onConfirm() })
+
+	mockTextService.EXPECT().DeleteText("1").Return(nil)
+	mockClient.EXPECT().ShowInfoModal("Text data deleted successfully", currentView).Times(1)
+	mockClient.EXPECT().TextsView(previousView).Times(1)
+
+	deleteTextHandler(mockClient, mockTextService, "1", currentView, previousView)
+}
+
+func TestDeleteTextHandler_Error(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockClient := NewMockClient(ctrl)
+	mockTextService := NewMockTextService(ctrl)
+
+	currentView := tview.NewBox()
+	previousView := tview.NewBox()
+
+	mockClient.EXPECT().ShowConfirmModal("Are you sure you want to delete this text data?", currentView, gomock.Any()).
+		Do(func(title string, view tview.Primitive, onConfirm func()) { onConfirm() })
+
+	err := errors.New("failed to delete text")
+	mockTextService.EXPECT().DeleteText("1").Return(err)
+	mockClient.EXPECT().ShowInfoModal("Failed to delete text data: failed to delete text", currentView).Times(1)
+
+	deleteTextHandler(mockClient, mockTextService, "1", currentView, previousView)
 }
 
 func TestFilesView(t *testing.T) {
@@ -232,4 +353,79 @@ func TestFilesView(t *testing.T) {
 	assert.Equal(t, downloadBtnText, secondDownloadCell, "Second row, download column should contain the download button text")
 	secondDeleteCell := table.GetCell(2, 4).Text
 	assert.Equal(t, deleteBtnText, secondDeleteCell, "Second row, delete column should contain the delete button text")
+}
+
+func TestDeleteFileHandler_Success(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockClient := NewMockClient(ctrl)
+	mockFileService := NewMockFileService(ctrl)
+
+	currentView := tview.NewBox()
+	previousView := tview.NewBox()
+
+	mockClient.EXPECT().ShowConfirmModal("Are you sure you want to delete this file?", currentView, gomock.Any()).
+		Do(func(title string, view tview.Primitive, onConfirm func()) { onConfirm() })
+
+	mockFileService.EXPECT().DeleteFile("1").Return(nil)
+	mockClient.EXPECT().ShowInfoModal("File deleted successfully", currentView).Times(1)
+	mockClient.EXPECT().FilesView(previousView).Times(1)
+
+	deleteFileHandler(mockClient, mockFileService, "1", currentView, previousView)
+}
+
+func TestDeleteFileHandler_Error(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockClient := NewMockClient(ctrl)
+	mockFileService := NewMockFileService(ctrl)
+
+	currentView := tview.NewBox()
+	previousView := tview.NewBox()
+
+	mockClient.EXPECT().ShowConfirmModal("Are you sure you want to delete this file?", currentView, gomock.Any()).
+		Do(func(title string, view tview.Primitive, onConfirm func()) { onConfirm() })
+
+	err := errors.New("failed to delete file")
+	mockFileService.EXPECT().DeleteFile("1").Return(err)
+	mockClient.EXPECT().ShowInfoModal("Failed to delete file: failed to delete file", currentView).Times(1)
+
+	deleteFileHandler(mockClient, mockFileService, "1", currentView, previousView)
+}
+
+func TestDownloadFile_Success(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockClient := NewMockClient(ctrl)
+	mockFileService := NewMockFileService(ctrl)
+
+	currentView := tview.NewBox()
+
+	mockFileService.EXPECT().DownloadFile(gomock.Any(), "1", "/path", gomock.Any()).Return(nil)
+
+	mockClient.EXPECT().SelectView(gomock.Any()).Times(1)
+	mockClient.EXPECT().QueueUpdateDraw(gomock.Any()).AnyTimes()
+
+	downloadFile(mockClient, mockFileService, "1", "/path", currentView)
+}
+
+func TestDownloadFile_Error(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockClient := NewMockClient(ctrl)
+	mockFileService := NewMockFileService(ctrl)
+
+	currentView := tview.NewBox()
+
+	err := errors.New("failed to download file")
+	mockFileService.EXPECT().DownloadFile(gomock.Any(), "1", "/path", gomock.Any()).Return(err)
+
+	mockClient.EXPECT().SelectView(gomock.Any()).Times(1)
+	mockClient.EXPECT().QueueUpdateDraw(gomock.Any()).AnyTimes()
+
+	downloadFile(mockClient, mockFileService, "1", "/path", currentView)
 }

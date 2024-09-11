@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	"github.com/rivo/tview"
 	"google.golang.org/grpc/status"
@@ -35,7 +36,8 @@ func (c *ClientImpl) AddAccountView() tview.Primitive {
 	form.AddInputField("Login", "", 20, nil, nil).
 		AddInputField("Password", "", 20, nil, nil).
 		AddInputField("Comment", "", 20, nil, nil).
-		AddButton("Add", func() { c.addAccountHandler(form) }).AddButton("Cancel", func() { c.MainView() })
+		AddButton("Add", func() { addAccountHandler(c, c.accountService, form) }).
+		AddButton("Cancel", func() { c.MainView() })
 
 	selectView(c.app, form)
 
@@ -43,12 +45,12 @@ func (c *ClientImpl) AddAccountView() tview.Primitive {
 }
 
 // addAccountHandler processes the form submit for adding user account data.
-func (c *ClientImpl) addAccountHandler(form *tview.Form) {
+func addAccountHandler(c Client, accountService AccountService, form *tview.Form) {
 	login := form.GetFormItemByLabel("Login").(*tview.InputField).GetText()
 	password := form.GetFormItemByLabel("Password").(*tview.InputField).GetText()
 	comment := form.GetFormItemByLabel("Comment").(*tview.InputField).GetText()
 
-	err := c.accountService.CreateAccount(login, password, comment)
+	err := accountService.CreateAccount(login, password, comment)
 	if err != nil {
 		st, ok := status.FromError(err)
 		if !ok {
@@ -73,7 +75,7 @@ func (c *ClientImpl) AddCardView() tview.Primitive {
 		AddInputField("CVC", "", 20, nil, nil).
 		AddInputField("PIN", "", 20, nil, nil).
 		AddInputField("Comment", "", 20, nil, nil).
-		AddButton("Add", func() { c.addCardHandler(form) }).
+		AddButton("Add", func() { addCardHandler(c, c.cardService, form) }).
 		AddButton("Cancel", func() { c.MainView() })
 
 	selectView(c.app, form)
@@ -82,7 +84,7 @@ func (c *ClientImpl) AddCardView() tview.Primitive {
 }
 
 // addCardHandler processes the form submit for adding user card data.
-func (c *ClientImpl) addCardHandler(form *tview.Form) {
+func addCardHandler(c Client, cardService CardService, form *tview.Form) {
 	number := form.GetFormItemByLabel("Number").(*tview.InputField).GetText()
 	owner := form.GetFormItemByLabel("Owner").(*tview.InputField).GetText()
 	expiry := form.GetFormItemByLabel("Expiry").(*tview.InputField).GetText()
@@ -90,7 +92,7 @@ func (c *ClientImpl) addCardHandler(form *tview.Form) {
 	pin := form.GetFormItemByLabel("PIN").(*tview.InputField).GetText()
 	comment := form.GetFormItemByLabel("Comment").(*tview.InputField).GetText()
 
-	err := c.cardService.CreateCard(number, owner, expiry, cvc, pin, comment)
+	err := cardService.CreateCard(number, owner, expiry, cvc, pin, comment)
 	if err != nil {
 		st, ok := status.FromError(err)
 		if !ok {
@@ -110,7 +112,7 @@ func (c *ClientImpl) AddTextView() tview.Primitive {
 	form := tview.NewForm()
 	form.AddInputField("Text", "", 40, nil, nil).
 		AddInputField("Comment", "", 20, nil, nil).
-		AddButton("Add", func() { c.addTextHandler(form) }).
+		AddButton("Add", func() { addTextHandler(c, c.textService, form) }).
 		AddButton("Cancel", func() { c.MainView() })
 
 	selectView(c.app, form)
@@ -119,11 +121,11 @@ func (c *ClientImpl) AddTextView() tview.Primitive {
 }
 
 // addTextHandler processes the form submission for adding user text data.
-func (c *ClientImpl) addTextHandler(form *tview.Form) {
+func addTextHandler(c Client, textService TextService, form *tview.Form) {
 	text := form.GetFormItemByLabel("Text").(*tview.InputField).GetText()
 	comment := form.GetFormItemByLabel("Comment").(*tview.InputField).GetText()
 
-	err := c.textService.CreateText(text, comment)
+	err := textService.CreateText(text, comment)
 	if err != nil {
 		st, ok := status.FromError(err)
 		if !ok {
@@ -144,7 +146,7 @@ func (c *ClientImpl) AddFileView() tview.Primitive {
 
 	form.AddInputField("File path", "", 40, nil, nil).
 		AddInputField("Comment", "", 40, nil, nil).
-		AddButton("Upload", func() { c.uploadFileHandler(form) }).
+		AddButton("Upload", func() { uploadFileHandler(c, c.fileService, form) }).
 		AddButton("Cancel", func() { c.MainView() })
 
 	selectView(c.app, form)
@@ -153,7 +155,7 @@ func (c *ClientImpl) AddFileView() tview.Primitive {
 }
 
 // uploadFileHandler processes the form submit for upload user file to the server.
-func (c *ClientImpl) uploadFileHandler(form *tview.Form) {
+func uploadFileHandler(c Client, fileService FileService, form *tview.Form) {
 	filePath := form.GetFormItemByLabel("File path").(*tview.InputField).GetText()
 	comment := form.GetFormItemByLabel("Comment").(*tview.InputField).GetText()
 
@@ -161,7 +163,7 @@ func (c *ClientImpl) uploadFileHandler(form *tview.Form) {
 
 	progressText := tview.NewTextView().
 		SetText("Uploading... 0%").
-		SetChangedFunc(func() { c.app.Draw() })
+		SetChangedFunc(func() { c.UpdateDraw() })
 
 	progressBar := tview.NewFlex().
 		SetDirection(tview.FlexRow).
@@ -174,7 +176,7 @@ func (c *ClientImpl) uploadFileHandler(form *tview.Form) {
 		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 			if buttonLabel == "Cancel" {
 				cancel()
-				selectView(c.app, form)
+				c.SelectView(form)
 			}
 		})
 
@@ -182,19 +184,25 @@ func (c *ClientImpl) uploadFileHandler(form *tview.Form) {
 		AddPage("progressBar", progressBar, true, true).
 		AddPage("modal", modal, true, true)
 
+	var wg sync.WaitGroup
+	wg.Add(1)
+
 	go func() {
-		err := c.fileService.UploadFile(ctx, filePath, comment, func(progress float64) {
-			c.app.QueueUpdateDraw(func() { progressText.SetText(fmt.Sprintf("Uploading... %.2f%%", progress)) })
+		defer wg.Done()
+
+		err := fileService.UploadFile(ctx, filePath, comment, func(progress float64) {
+			c.QueueUpdateDraw(func() { progressText.SetText(fmt.Sprintf("Uploading... %.2f%%", progress)) })
 		})
 		if err != nil {
-			c.app.QueueUpdateDraw(func() { c.ShowInfoModal("Failed to upload file", form) })
+			c.QueueUpdateDraw(func() { c.ShowInfoModal("Failed to upload file", form) })
 		} else {
-			c.app.QueueUpdateDraw(func() {
+			c.QueueUpdateDraw(func() {
 				clearForm(form)
 				c.ShowInfoModal("File uploaded successfully", form)
 			})
 		}
 	}()
 
-	selectView(c.app, pages)
+	c.SelectView(pages)
+	wg.Wait()
 }
