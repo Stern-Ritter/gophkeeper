@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"fmt"
 	"net"
 	"os"
 	"os/signal"
@@ -10,7 +9,6 @@ import (
 
 	"github.com/bufbuild/protovalidate-go"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/pressly/goose/v3"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -45,7 +43,7 @@ func Run(cfg *config.ServerConfig, logger *logger.ServerLogger) error {
 		logger.Fatal("Failed to connect database", zap.String("event", "connect database"),
 			zap.String("database url", cfg.DatabaseDSN), zap.Error(err))
 	}
-	err = migrateDatabase(cfg.DatabaseDSN)
+	err = migrations.MigrateDatabase(cfg.DatabaseDSN)
 	if err != nil {
 		logger.Fatal("Failed to migrate database", zap.String("event", "migrate database"),
 			zap.String("database url", cfg.DatabaseDSN), zap.Error(err))
@@ -73,28 +71,6 @@ func Run(cfg *config.ServerConfig, logger *logger.ServerLogger) error {
 
 	err = runGrpcServer(server, signals, idleConnsClosed)
 	return err
-}
-
-func migrateDatabase(databaseDsn string) error {
-	goose.SetBaseFS(migrations.Migrations)
-	if err := goose.SetDialect("postgres"); err != nil {
-		return fmt.Errorf("goose failed to set postgres dialect: %w", err)
-	}
-
-	db, err := goose.OpenDBWithDriver("pgx", databaseDsn)
-	if err != nil {
-		return fmt.Errorf("goose failed to open database connection: %w", err)
-	}
-
-	if err := goose.Up(db, "."); err != nil {
-		return fmt.Errorf("goose failed to migrate database: %w", err)
-	}
-
-	if err := db.Close(); err != nil {
-		return fmt.Errorf("goose failed to close database connection: %w", err)
-	}
-
-	return nil
 }
 
 func runGrpcServer(server *service.Server, signals chan os.Signal, idleConnsClosed chan struct{}) error {

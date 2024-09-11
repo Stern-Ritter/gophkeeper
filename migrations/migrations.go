@@ -10,19 +10,19 @@ import (
 //go:embed "*.sql"
 var Migrations embed.FS
 
-func Migrate(databaseURL string, dialect string, driverName string) error {
+func MigrateDatabase(databaseDsn string) error {
 	goose.SetBaseFS(Migrations)
-	if err := goose.SetDialect(dialect); err != nil {
-		return fmt.Errorf("goose failed to set %s dialect: %w", dialect, err)
+	if err := goose.SetDialect("postgres"); err != nil {
+		return fmt.Errorf("goose failed to set postgres dialect: %w", err)
 	}
 
-	db, err := goose.OpenDBWithDriver(driverName, databaseURL)
+	db, err := goose.OpenDBWithDriver("pgx", databaseDsn)
 	if err != nil {
 		return fmt.Errorf("goose failed to open database connection: %w", err)
 	}
 
 	if err := goose.Up(db, "."); err != nil {
-		return fmt.Errorf("goose failed to up migrations: %w", err)
+		return fmt.Errorf("goose failed to migrate database: %w", err)
 	}
 
 	if err := db.Close(); err != nil {
