@@ -27,11 +27,11 @@ type CardService interface {
 type CardServiceImpl struct {
 	dataStorage         storage.DataStorage
 	encryptionSecretKey string
-	logger              *logger.ServerLogger
+	logger              logger.ServerLogger
 }
 
 // NewCardService creates a new instance of CardService.
-func NewCardService(dataStorage storage.DataStorage, encryptionSecretKey string, logger *logger.ServerLogger) CardService {
+func NewCardService(dataStorage storage.DataStorage, encryptionSecretKey string, logger logger.ServerLogger) CardService {
 	return &CardServiceImpl{
 		dataStorage:         dataStorage,
 		encryptionSecretKey: encryptionSecretKey,

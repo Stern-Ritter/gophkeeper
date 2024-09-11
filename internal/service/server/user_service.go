@@ -21,11 +21,11 @@ type UserService interface {
 // UserServiceImpl is an implementation of the UserService interface.
 type UserServiceImpl struct {
 	userStorage storage.UserStorage
-	logger      *logger.ServerLogger
+	logger      logger.ServerLogger
 }
 
 // NewUserService creates a new instance of UserService.
-func NewUserService(userStorage storage.UserStorage, logger *logger.ServerLogger) UserService {
+func NewUserService(userStorage storage.UserStorage, logger logger.ServerLogger) UserService {
 	return &UserServiceImpl{
 		userStorage: userStorage,
 		logger:      logger,

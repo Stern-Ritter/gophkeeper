@@ -27,11 +27,11 @@ type AccountService interface {
 type AccountServiceImpl struct {
 	dataStorage         storage.DataStorage
 	encryptionSecretKey string
-	logger              *logger.ServerLogger
+	logger              logger.ServerLogger
 }
 
 // NewAccountService creates a new instance of AccountService.
-func NewAccountService(dataStorage storage.DataStorage, encryptionSecretKey string, logger *logger.ServerLogger) AccountService {
+func NewAccountService(dataStorage storage.DataStorage, encryptionSecretKey string, logger logger.ServerLogger) AccountService {
 	return &AccountServiceImpl{
 		dataStorage:         dataStorage,
 		encryptionSecretKey: encryptionSecretKey,

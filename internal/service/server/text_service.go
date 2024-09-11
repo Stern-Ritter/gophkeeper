@@ -27,11 +27,11 @@ type TextService interface {
 type TextServiceImpl struct {
 	dataStorage         server.DataStorage
 	encryptionSecretKey string
-	logger              *logger.ServerLogger
+	logger              logger.ServerLogger
 }
 
 // NewTextService creates a new instance of TextService.
-func NewTextService(dataStorage server.DataStorage, encryptionSecretKey string, logger *logger.ServerLogger) TextService {
+func NewTextService(dataStorage server.DataStorage, encryptionSecretKey string, logger logger.ServerLogger) TextService {
 	return &TextServiceImpl{
 		dataStorage:         dataStorage,
 		encryptionSecretKey: encryptionSecretKey,

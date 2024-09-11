@@ -21,11 +21,11 @@ type UserStorage interface {
 // It uses a PgxIface for database operations and a Logger for logging errors.
 type UserStorageImpl struct {
 	db     PgxIface
-	Logger *logger.ServerLogger
+	Logger logger.ServerLogger
 }
 
 // NewUserStorage creates a new instance of UserStorage.
-func NewUserStorage(db PgxIface, logger *logger.ServerLogger) UserStorage {
+func NewUserStorage(db PgxIface, logger logger.ServerLogger) UserStorage {
 	return &UserStorageImpl{
 		db:     db,
 		Logger: logger,

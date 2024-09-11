@@ -25,7 +25,7 @@ import (
 	"github.com/Stern-Ritter/gophkeeper/migrations"
 )
 
-func Run(cfg *config.ServerConfig, logger *logger.ServerLogger) error {
+func Run(cfg *config.ServerConfig, logger logger.ServerLogger) error {
 	signals := make(chan os.Signal, 1)
 	signal.Notify(signals, syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
 	idleConnsClosed := make(chan struct{})

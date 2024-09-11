@@ -21,11 +21,11 @@ type DataStorage interface {
 // DataStorageImpl is an implementation of the DataStorage interface.
 type DataStorageImpl struct {
 	db     PgxIface
-	Logger *logger.ServerLogger
+	Logger logger.ServerLogger
 }
 
 // NewDataStorage creates a new instance of DataStorage.
-func NewDataStorage(db PgxIface, logger *logger.ServerLogger) DataStorage {
+func NewDataStorage(db PgxIface, logger logger.ServerLogger) DataStorage {
 	return &DataStorageImpl{
 		db:     db,
 		Logger: logger,

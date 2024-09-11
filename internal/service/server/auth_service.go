@@ -31,11 +31,11 @@ type AuthService interface {
 type AuthServiceImpl struct {
 	userService   UserService
 	authSecretKey string
-	logger        *logger.ServerLogger
+	logger        logger.ServerLogger
 }
 
 // NewAuthService creates a new instance of AuthService.
-func NewAuthService(userService UserService, authSecretKey string, logger *logger.ServerLogger) AuthService {
+func NewAuthService(userService UserService, authSecretKey string, logger logger.ServerLogger) AuthService {
 	return &AuthServiceImpl{
 		userService:   userService,
 		authSecretKey: authSecretKey,

@@ -18,7 +18,7 @@ type Server struct {
 	FileService    FileService
 	Validator      *protovalidate.Validator
 	Config         *config.ServerConfig
-	Logger         *logger.ServerLogger
+	Logger         logger.ServerLogger
 	pb.UnimplementedAuthServiceV1Server
 	pb.UnimplementedAccountServiceV1Server
 	pb.UnimplementedCardServiceV1Server
@@ -29,7 +29,7 @@ type Server struct {
 // NewServer creates a new instance of the Server
 func NewServer(userService UserService, authService AuthService, accountService AccountService, cardService CardService,
 	textService TextService, fileService FileService, validator *protovalidate.Validator, serverConfig *config.ServerConfig,
-	logger *logger.ServerLogger) *Server {
+	logger logger.ServerLogger) *Server {
 	return &Server{
 		UserService:    userService,
 		AuthService:    authService,

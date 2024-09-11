@@ -8,6 +8,7 @@ import (
 	app "github.com/Stern-Ritter/gophkeeper/internal/app/client"
 	config "github.com/Stern-Ritter/gophkeeper/internal/config/client"
 	logger "github.com/Stern-Ritter/gophkeeper/internal/logger/client"
+	service "github.com/Stern-Ritter/gophkeeper/internal/service/client"
 )
 
 var (
@@ -27,7 +28,8 @@ func main() {
 		log.Fatalf("%+v", err)
 	}
 
-	err = app.Run(&cfg, logger)
+	client := service.NewClient(&cfg)
+	err = app.Run(client, &cfg, logger)
 	if err != nil {
 		logger.Fatal(err.Error(), zap.String("event", "start application"))
 	}

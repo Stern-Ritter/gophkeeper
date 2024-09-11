@@ -15,9 +15,7 @@ import (
 	pb "github.com/Stern-Ritter/gophkeeper/proto/gen/gophkeeper/gophkeeperapi/v1"
 )
 
-func Run(cfg *config.ClientConfig, logger *logger.ClientLogger) error {
-	client := service.NewClient(cfg)
-
+func Run(client service.Client, cfg *config.ClientConfig, logger *logger.ClientLogger) error {
 	opts := make([]grpc.DialOption, 0)
 	opts = append(opts, grpc.WithDefaultCallOptions(grpc.UseCompressor(gzip.Name)))
 	opts = append(opts, grpc.WithUnaryInterceptor(client.AuthInterceptor))

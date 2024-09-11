@@ -37,11 +37,11 @@ type FileService interface {
 type FileServiceImpl struct {
 	fileStorage     storage.FileStorage
 	fileStoragePath string
-	logger          *logger.ServerLogger
+	logger          logger.ServerLogger
 }
 
 // NewFileService creates a new instance of FileService.
-func NewFileService(fileStorage storage.FileStorage, fileStoragePath string, logger *logger.ServerLogger) FileService {
+func NewFileService(fileStorage storage.FileStorage, fileStoragePath string, logger logger.ServerLogger) FileService {
 	return &FileServiceImpl{
 		fileStorage:     fileStorage,
 		fileStoragePath: fileStoragePath,
@@ -126,7 +126,7 @@ func (s *FileServiceImpl) UploadFile(ctx context.Context, userID string, stream 
 	return nil
 }
 
-func removeFileDueError(filePath string, userID string, err error, logger *logger.ServerLogger) {
+func removeFileDueError(filePath string, userID string, err error, logger logger.ServerLogger) {
 	logger.Error("Removing file due to error", zap.String("file", filePath),
 		zap.String("user id", userID), zap.Error(err))
 	removeFileErr := os.Remove(filePath)

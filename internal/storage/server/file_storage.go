@@ -21,11 +21,11 @@ type FileStorage interface {
 // FileStorageImpl is an implementation of the FileStorage interface.
 type FileStorageImpl struct {
 	db     PgxIface
-	Logger *logger.ServerLogger
+	Logger logger.ServerLogger
 }
 
 // NewFileStorage creates a new instance of FileStorage.
-func NewFileStorage(db PgxIface, logger *logger.ServerLogger) FileStorage {
+func NewFileStorage(db PgxIface, logger logger.ServerLogger) FileStorage {
 	return &FileStorageImpl{
 		db:     db,
 		Logger: logger,
