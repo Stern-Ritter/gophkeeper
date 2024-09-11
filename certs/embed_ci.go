@@ -3,18 +3,35 @@
 package certs
 
 import (
-	"errors"
 	"io/fs"
+	"os"
+	"path/filepath"
 )
 
-type mockFS struct{}
-
-func (mockFS) Open(name string) (fs.File, error) {
-	return nil, errors.New("mockFS does not contain files")
+type mockFS struct {
+	dir string
 }
 
-func (mockFS) ReadFile(name string) ([]byte, error) {
-	return nil, errors.New("mockFS does not contain files")
+func NewMockFS(dir string) *mockFS {
+	return &mockFS{dir: dir}
 }
 
-var Certs fs.ReadFileFS = mockFS{}
+func (r *mockFS) Open(name string) (fs.File, error) {
+	fullPath := filepath.Join(r.dir, name)
+	file, err := os.Open(fullPath)
+	if err != nil {
+		return nil, err
+	}
+	return file, nil
+}
+
+func (r *mockFS) ReadFile(name string) ([]byte, error) {
+	fullPath := filepath.Join(r.dir, name)
+	data, err := os.ReadFile(fullPath)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+var Certs fs.ReadFileFS = NewMockFS("../../../testdata/certs")
