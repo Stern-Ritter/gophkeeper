@@ -2,6 +2,7 @@ package client
 
 import (
 	"fmt"
+	"io/fs"
 	"os"
 	"testing"
 
@@ -20,6 +21,14 @@ func (m mockFS) ReadFile(name string) ([]byte, error) {
 		return data, nil
 	}
 	return nil, fmt.Errorf("file not found: %s", name)
+}
+
+func (m mockFS) Open(name string) (fs.File, error) {
+	return nil, nil
+}
+
+func (m mockFS) ReadDir(name string) ([]fs.DirEntry, error) {
+	return nil, nil
 }
 
 func mockCertsFS(files map[string][]byte) {

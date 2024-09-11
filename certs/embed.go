@@ -2,9 +2,14 @@
 
 package certs
 
-import "embed"
+import (
+	"embed"
+	"io/fs"
+)
 
 type FileSystem interface {
+	Open(name string) (fs.File, error)
+	ReadDir(name string) ([]fs.DirEntry, error)
 	ReadFile(name string) ([]byte, error)
 }
 
