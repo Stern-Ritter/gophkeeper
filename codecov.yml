@@ -10,3 +10,5 @@ coverage:
     - "**/*.gen.go"
     - "**/testdata/**"
     - "migrations/**"
+    - "certs/**"
+    - "cmd/staticlint/**"
