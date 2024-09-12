@@ -14,6 +14,7 @@ import (
 	reflect "reflect"
 
 	client "github.com/Stern-Ritter/gophkeeper/internal/service/client"
+	tcell "github.com/gdamore/tcell/v2"
 	tview "github.com/rivo/tview"
 	gomock "go.uber.org/mock/gomock"
 	grpc "google.golang.org/grpc"
@@ -56,6 +57,146 @@ func (mr *MockApplicationMockRecorder) Draw() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Draw", reflect.TypeOf((*MockApplication)(nil).Draw))
 }
 
+// EnableMouse mocks base method.
+func (m *MockApplication) EnableMouse(enable bool) *tview.Application {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "EnableMouse", enable)
+	ret0, _ := ret[0].(*tview.Application)
+	return ret0
+}
+
+// EnableMouse indicates an expected call of EnableMouse.
+func (mr *MockApplicationMockRecorder) EnableMouse(enable any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EnableMouse", reflect.TypeOf((*MockApplication)(nil).EnableMouse), enable)
+}
+
+// EnablePaste mocks base method.
+func (m *MockApplication) EnablePaste(enable bool) *tview.Application {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "EnablePaste", enable)
+	ret0, _ := ret[0].(*tview.Application)
+	return ret0
+}
+
+// EnablePaste indicates an expected call of EnablePaste.
+func (mr *MockApplicationMockRecorder) EnablePaste(enable any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EnablePaste", reflect.TypeOf((*MockApplication)(nil).EnablePaste), enable)
+}
+
+// ForceDraw mocks base method.
+func (m *MockApplication) ForceDraw() *tview.Application {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ForceDraw")
+	ret0, _ := ret[0].(*tview.Application)
+	return ret0
+}
+
+// ForceDraw indicates an expected call of ForceDraw.
+func (mr *MockApplicationMockRecorder) ForceDraw() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ForceDraw", reflect.TypeOf((*MockApplication)(nil).ForceDraw))
+}
+
+// GetAfterDrawFunc mocks base method.
+func (m *MockApplication) GetAfterDrawFunc() func(tcell.Screen) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAfterDrawFunc")
+	ret0, _ := ret[0].(func(tcell.Screen))
+	return ret0
+}
+
+// GetAfterDrawFunc indicates an expected call of GetAfterDrawFunc.
+func (mr *MockApplicationMockRecorder) GetAfterDrawFunc() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAfterDrawFunc", reflect.TypeOf((*MockApplication)(nil).GetAfterDrawFunc))
+}
+
+// GetBeforeDrawFunc mocks base method.
+func (m *MockApplication) GetBeforeDrawFunc() func(tcell.Screen) bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetBeforeDrawFunc")
+	ret0, _ := ret[0].(func(tcell.Screen) bool)
+	return ret0
+}
+
+// GetBeforeDrawFunc indicates an expected call of GetBeforeDrawFunc.
+func (mr *MockApplicationMockRecorder) GetBeforeDrawFunc() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBeforeDrawFunc", reflect.TypeOf((*MockApplication)(nil).GetBeforeDrawFunc))
+}
+
+// GetFocus mocks base method.
+func (m *MockApplication) GetFocus() tview.Primitive {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetFocus")
+	ret0, _ := ret[0].(tview.Primitive)
+	return ret0
+}
+
+// GetFocus indicates an expected call of GetFocus.
+func (mr *MockApplicationMockRecorder) GetFocus() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFocus", reflect.TypeOf((*MockApplication)(nil).GetFocus))
+}
+
+// GetInputCapture mocks base method.
+func (m *MockApplication) GetInputCapture() func(*tcell.EventKey) *tcell.EventKey {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetInputCapture")
+	ret0, _ := ret[0].(func(*tcell.EventKey) *tcell.EventKey)
+	return ret0
+}
+
+// GetInputCapture indicates an expected call of GetInputCapture.
+func (mr *MockApplicationMockRecorder) GetInputCapture() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetInputCapture", reflect.TypeOf((*MockApplication)(nil).GetInputCapture))
+}
+
+// GetMouseCapture mocks base method.
+func (m *MockApplication) GetMouseCapture() func(*tcell.EventMouse, tview.MouseAction) (*tcell.EventMouse, tview.MouseAction) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetMouseCapture")
+	ret0, _ := ret[0].(func(*tcell.EventMouse, tview.MouseAction) (*tcell.EventMouse, tview.MouseAction))
+	return ret0
+}
+
+// GetMouseCapture indicates an expected call of GetMouseCapture.
+func (mr *MockApplicationMockRecorder) GetMouseCapture() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMouseCapture", reflect.TypeOf((*MockApplication)(nil).GetMouseCapture))
+}
+
+// QueueEvent mocks base method.
+func (m *MockApplication) QueueEvent(event tcell.Event) *tview.Application {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "QueueEvent", event)
+	ret0, _ := ret[0].(*tview.Application)
+	return ret0
+}
+
+// QueueEvent indicates an expected call of QueueEvent.
+func (mr *MockApplicationMockRecorder) QueueEvent(event any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "QueueEvent", reflect.TypeOf((*MockApplication)(nil).QueueEvent), event)
+}
+
+// QueueUpdate mocks base method.
+func (m *MockApplication) QueueUpdate(f func()) *tview.Application {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "QueueUpdate", f)
+	ret0, _ := ret[0].(*tview.Application)
+	return ret0
+}
+
+// QueueUpdate indicates an expected call of QueueUpdate.
+func (mr *MockApplicationMockRecorder) QueueUpdate(f any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "QueueUpdate", reflect.TypeOf((*MockApplication)(nil).QueueUpdate), f)
+}
+
 // QueueUpdateDraw mocks base method.
 func (m *MockApplication) QueueUpdateDraw(f func()) *tview.Application {
 	m.ctrl.T.Helper()
@@ -68,6 +209,20 @@ func (m *MockApplication) QueueUpdateDraw(f func()) *tview.Application {
 func (mr *MockApplicationMockRecorder) QueueUpdateDraw(f any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "QueueUpdateDraw", reflect.TypeOf((*MockApplication)(nil).QueueUpdateDraw), f)
+}
+
+// ResizeToFullScreen mocks base method.
+func (m *MockApplication) ResizeToFullScreen(p tview.Primitive) *tview.Application {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ResizeToFullScreen", p)
+	ret0, _ := ret[0].(*tview.Application)
+	return ret0
+}
+
+// ResizeToFullScreen indicates an expected call of ResizeToFullScreen.
+func (mr *MockApplicationMockRecorder) ResizeToFullScreen(p any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResizeToFullScreen", reflect.TypeOf((*MockApplication)(nil).ResizeToFullScreen), p)
 }
 
 // Run mocks base method.
@@ -84,6 +239,76 @@ func (mr *MockApplicationMockRecorder) Run() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Run", reflect.TypeOf((*MockApplication)(nil).Run))
 }
 
+// SetAfterDrawFunc mocks base method.
+func (m *MockApplication) SetAfterDrawFunc(handler func(tcell.Screen)) *tview.Application {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetAfterDrawFunc", handler)
+	ret0, _ := ret[0].(*tview.Application)
+	return ret0
+}
+
+// SetAfterDrawFunc indicates an expected call of SetAfterDrawFunc.
+func (mr *MockApplicationMockRecorder) SetAfterDrawFunc(handler any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetAfterDrawFunc", reflect.TypeOf((*MockApplication)(nil).SetAfterDrawFunc), handler)
+}
+
+// SetBeforeDrawFunc mocks base method.
+func (m *MockApplication) SetBeforeDrawFunc(handler func(tcell.Screen) bool) *tview.Application {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetBeforeDrawFunc", handler)
+	ret0, _ := ret[0].(*tview.Application)
+	return ret0
+}
+
+// SetBeforeDrawFunc indicates an expected call of SetBeforeDrawFunc.
+func (mr *MockApplicationMockRecorder) SetBeforeDrawFunc(handler any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetBeforeDrawFunc", reflect.TypeOf((*MockApplication)(nil).SetBeforeDrawFunc), handler)
+}
+
+// SetFocus mocks base method.
+func (m *MockApplication) SetFocus(p tview.Primitive) *tview.Application {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetFocus", p)
+	ret0, _ := ret[0].(*tview.Application)
+	return ret0
+}
+
+// SetFocus indicates an expected call of SetFocus.
+func (mr *MockApplicationMockRecorder) SetFocus(p any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetFocus", reflect.TypeOf((*MockApplication)(nil).SetFocus), p)
+}
+
+// SetInputCapture mocks base method.
+func (m *MockApplication) SetInputCapture(capture func(*tcell.EventKey) *tcell.EventKey) *tview.Application {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetInputCapture", capture)
+	ret0, _ := ret[0].(*tview.Application)
+	return ret0
+}
+
+// SetInputCapture indicates an expected call of SetInputCapture.
+func (mr *MockApplicationMockRecorder) SetInputCapture(capture any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetInputCapture", reflect.TypeOf((*MockApplication)(nil).SetInputCapture), capture)
+}
+
+// SetMouseCapture mocks base method.
+func (m *MockApplication) SetMouseCapture(capture func(*tcell.EventMouse, tview.MouseAction) (*tcell.EventMouse, tview.MouseAction)) *tview.Application {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetMouseCapture", capture)
+	ret0, _ := ret[0].(*tview.Application)
+	return ret0
+}
+
+// SetMouseCapture indicates an expected call of SetMouseCapture.
+func (mr *MockApplicationMockRecorder) SetMouseCapture(capture any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetMouseCapture", reflect.TypeOf((*MockApplication)(nil).SetMouseCapture), capture)
+}
+
 // SetRoot mocks base method.
 func (m *MockApplication) SetRoot(root tview.Primitive, fullscreen bool) *tview.Application {
 	m.ctrl.T.Helper()
@@ -98,6 +323,20 @@ func (mr *MockApplicationMockRecorder) SetRoot(root, fullscreen any) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetRoot", reflect.TypeOf((*MockApplication)(nil).SetRoot), root, fullscreen)
 }
 
+// SetScreen mocks base method.
+func (m *MockApplication) SetScreen(screen tcell.Screen) *tview.Application {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetScreen", screen)
+	ret0, _ := ret[0].(*tview.Application)
+	return ret0
+}
+
+// SetScreen indicates an expected call of SetScreen.
+func (mr *MockApplicationMockRecorder) SetScreen(screen any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetScreen", reflect.TypeOf((*MockApplication)(nil).SetScreen), screen)
+}
+
 // Stop mocks base method.
 func (m *MockApplication) Stop() {
 	m.ctrl.T.Helper()
@@ -108,6 +347,34 @@ func (m *MockApplication) Stop() {
 func (mr *MockApplicationMockRecorder) Stop() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Stop", reflect.TypeOf((*MockApplication)(nil).Stop))
+}
+
+// Suspend mocks base method.
+func (m *MockApplication) Suspend(f func()) bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Suspend", f)
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// Suspend indicates an expected call of Suspend.
+func (mr *MockApplicationMockRecorder) Suspend(f any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Suspend", reflect.TypeOf((*MockApplication)(nil).Suspend), f)
+}
+
+// Sync mocks base method.
+func (m *MockApplication) Sync() *tview.Application {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Sync")
+	ret0, _ := ret[0].(*tview.Application)
+	return ret0
+}
+
+// Sync indicates an expected call of Sync.
+func (mr *MockApplicationMockRecorder) Sync() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Sync", reflect.TypeOf((*MockApplication)(nil).Sync))
 }
 
 // MockClient is a mock of Client interface.

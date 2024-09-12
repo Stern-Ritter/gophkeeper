@@ -26,7 +26,8 @@ func (c *ClientImpl) QueueUpdateDraw(render func()) {
 // selectView sets the given view as the root of the application and focuses on it.
 // This function is useful for switching between different views in application.
 func selectView(app Application, view tview.Primitive) {
-	app.SetRoot(view, true).SetFocus(view)
+	app.SetRoot(view, true)
+	app.SetFocus(view)
 }
 
 // setTableHeader sets the header row of a tview.Table with the given column names.

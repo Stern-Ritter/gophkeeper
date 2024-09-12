@@ -6,6 +6,7 @@ import (
 
 	"github.com/rivo/tview"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -475,6 +476,31 @@ func TestDeleteFileHandler_GRPCError(t *testing.T) {
 	mockClient.EXPECT().ShowInfoModal("Failed to delete file: internal server error", currentView).Times(1)
 
 	deleteFileHandler(mockClient, mockFileService, "1", currentView, previousView)
+}
+
+func TestDownloadFileHandler(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockClient := NewMockClient(ctrl)
+	mockFileService := NewMockFileService(ctrl)
+	currentView := tview.NewBox()
+	fileID := "1"
+
+	mockClient.EXPECT().SelectView(gomock.Any()).Times(1)
+
+	form, ok := downloadFileHandler(mockClient, mockFileService, fileID, currentView).(*tview.Form)
+	require.True(t, ok, "should return form")
+
+	inputField := form.GetFormItemByLabel("Directory path")
+	assert.NotNil(t, inputField, "Directory path input field should be present")
+	assert.IsType(t, &tview.InputField{}, inputField)
+
+	downloadButton := form.GetButton(0)
+	assert.Equal(t, "Download", downloadButton.GetLabel(), "The first button should be 'Download'")
+
+	cancelButton := form.GetButton(1)
+	assert.Equal(t, "Cancel", cancelButton.GetLabel(), "The second button should be 'Cancel'")
 }
 
 func TestDownloadFile_Success(t *testing.T) {

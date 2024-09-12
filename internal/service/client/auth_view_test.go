@@ -7,6 +7,8 @@ import (
 	"github.com/rivo/tview"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	config "github.com/Stern-Ritter/gophkeeper/internal/config/client"
 )
@@ -69,12 +71,39 @@ func TestSignUpHandler_Success(t *testing.T) {
 	assert.Equal(t, "auth token", client.authToken, "Auth token should be set")
 }
 
-func TestSignUpHandler_Failure(t *testing.T) {
+func TestSignUpHandler_Error(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
 	authService := NewMockAuthService(mockCtrl)
-	authService.EXPECT().SignUp("user", "password").Return("", fmt.Errorf("registration failed"))
+	err := fmt.Errorf("registration failed")
+	authService.EXPECT().SignUp("user", "password").Return("", err)
+
+	app := tview.NewApplication()
+	cfg := &config.ClientConfig{}
+	client := ClientImpl{
+		authService: authService,
+		config:      cfg,
+	}
+	client.SetApp(app)
+	client.SetAuthService(authService)
+
+	form := tview.NewForm()
+	form.AddInputField("Login", "user", 20, nil, nil)
+	form.AddInputField("Password", "password", 20, nil, nil)
+
+	client.signUpHandler(form)
+
+	assert.Empty(t, client.authToken, "Auth token should be empty")
+}
+
+func TestSignUpHandler_GRPCError(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	authService := NewMockAuthService(mockCtrl)
+	grpcErr := status.Error(codes.Internal, "internal server error")
+	authService.EXPECT().SignUp("user", "password").Return("", grpcErr)
 
 	app := tview.NewApplication()
 	cfg := &config.ClientConfig{}
@@ -119,12 +148,39 @@ func TestSignInHandler_Success(t *testing.T) {
 	assert.Equal(t, "auth token", client.authToken, "Auth token should be set")
 }
 
-func TestSignInHandler_Failure(t *testing.T) {
+func TestSignInHandler_GRPCError(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
 	authService := NewMockAuthService(mockCtrl)
-	authService.EXPECT().SignIn("user", "password").Return("", fmt.Errorf("authentication failed"))
+	err := fmt.Errorf("authentication failed")
+	authService.EXPECT().SignIn("user", "password").Return("", err)
+
+	app := tview.NewApplication()
+	cfg := &config.ClientConfig{}
+	client := ClientImpl{
+		authService: authService,
+		config:      cfg,
+	}
+	client.SetApp(app)
+	client.SetAuthService(authService)
+
+	form := tview.NewForm()
+	form.AddInputField("Login", "user", 20, nil, nil)
+	form.AddInputField("Password", "password", 20, nil, nil)
+
+	client.signInHandler(form)
+
+	assert.Empty(t, client.authToken, "Auth token should be empty")
+}
+
+func TestSignInHandler_Error(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	authService := NewMockAuthService(mockCtrl)
+	grpcErr := status.Error(codes.Internal, "internal server error")
+	authService.EXPECT().SignIn("user", "password").Return("", grpcErr)
 
 	app := tview.NewApplication()
 	cfg := &config.ClientConfig{}

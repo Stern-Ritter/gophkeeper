@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 
+	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 	"google.golang.org/grpc"
 
@@ -10,11 +11,30 @@ import (
 )
 
 type Application interface {
+	SetInputCapture(capture func(event *tcell.EventKey) *tcell.EventKey) *tview.Application
+	GetInputCapture() func(event *tcell.EventKey) *tcell.EventKey
+	SetMouseCapture(capture func(event *tcell.EventMouse, action tview.MouseAction) (*tcell.EventMouse, tview.MouseAction)) *tview.Application
+	GetMouseCapture() func(event *tcell.EventMouse, action tview.MouseAction) (*tcell.EventMouse, tview.MouseAction)
+	SetScreen(screen tcell.Screen) *tview.Application
+	EnableMouse(enable bool) *tview.Application
+	EnablePaste(enable bool) *tview.Application
 	Run() error
 	Stop()
-	SetRoot(root tview.Primitive, fullscreen bool) *tview.Application
+	Suspend(f func()) bool
 	Draw() *tview.Application
+	ForceDraw() *tview.Application
+	Sync() *tview.Application
+	SetBeforeDrawFunc(handler func(screen tcell.Screen) bool) *tview.Application
+	GetBeforeDrawFunc() func(screen tcell.Screen) bool
+	SetAfterDrawFunc(handler func(screen tcell.Screen)) *tview.Application
+	GetAfterDrawFunc() func(screen tcell.Screen)
+	SetRoot(root tview.Primitive, fullscreen bool) *tview.Application
+	ResizeToFullScreen(p tview.Primitive) *tview.Application
+	SetFocus(p tview.Primitive) *tview.Application
+	GetFocus() tview.Primitive
+	QueueUpdate(f func()) *tview.Application
 	QueueUpdateDraw(f func()) *tview.Application
+	QueueEvent(event tcell.Event) *tview.Application
 }
 
 // Client represents a client in the TUI application, managing services and the application.

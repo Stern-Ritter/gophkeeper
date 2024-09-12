@@ -242,7 +242,7 @@ func deleteFileHandler(c Client, fileService FileService, fileID string, current
 
 // downloadFileHandler displays a form for entering the directory path to download a file.
 // It starts the download when the "Download" button is clicked.
-func downloadFileHandler(c Client, fileService FileService, fileID string, currentView tview.Primitive) {
+func downloadFileHandler(c Client, fileService FileService, fileID string, currentView tview.Primitive) tview.Primitive {
 	form := tview.NewForm()
 	form.AddInputField("Directory path", "", 40, nil, nil).
 		AddButton("Download", func() {
@@ -252,6 +252,8 @@ func downloadFileHandler(c Client, fileService FileService, fileID string, curre
 		AddButton("Cancel", func() { c.SelectView(currentView) })
 
 	c.SelectView(form)
+
+	return form
 }
 
 // downloadFile initiates the download of a file and displays a progress indicator.
