@@ -18,7 +18,7 @@ import (
 	pb "github.com/Stern-Ritter/gophkeeper/proto/gen/gophkeeper/gophkeeperapi/v1"
 )
 
-func TestFileServiceImplUploadFile_Success(t *testing.T) {
+func TestUploadFile_Success(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -52,7 +52,24 @@ func TestFileServiceImplUploadFile_Success(t *testing.T) {
 	assert.NoError(t, err, "Expected no error during file upload")
 }
 
-func TestFileServiceImplUploadFile_RecvError(t *testing.T) {
+func TestUploadFile_RecvMetadataError(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockFileStorage := NewMockFileStorage(ctrl)
+	l, err := logger.Initialize("error")
+	require.NoError(t, err, "Error init logger")
+
+	fileService := NewFileService(mockFileStorage, "/tmp", l)
+
+	stream := NewMockFileServiceV1_UploadFileServer(ctrl)
+	stream.EXPECT().Recv().Return(nil, fmt.Errorf("failed to receive data"))
+
+	err = fileService.UploadFile(context.Background(), "1", stream)
+	assert.Error(t, err, "Expected error due to stream receiving failure")
+}
+
+func TestUploadFile_RecvFilePartError(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -79,7 +96,7 @@ func TestFileServiceImplUploadFile_RecvError(t *testing.T) {
 	assert.Error(t, err, "Expected error due to stream receiving failure")
 }
 
-func TestFileServiceImplUploadFile_InternalError(t *testing.T) {
+func TestUploadFile_InternalError(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -113,7 +130,7 @@ func TestFileServiceImplUploadFile_InternalError(t *testing.T) {
 	assert.Error(t, err, "Expected internal error during file upload")
 }
 
-func TestFileServiceImplDownloadFile_Success(t *testing.T) {
+func TestDownloadFile_Success(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -161,7 +178,7 @@ func TestFileServiceImplDownloadFile_Success(t *testing.T) {
 	assert.NoError(t, err, "Expected no error during file download")
 }
 
-func TestFileServiceImplDownloadFile_NotFound(t *testing.T) {
+func TestDownloadFile_NotFound(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -182,7 +199,95 @@ func TestFileServiceImplDownloadFile_NotFound(t *testing.T) {
 	assert.ErrorAs(t, err, &er.NotFoundError{}, "Expected NotFoundError when file is not found")
 }
 
-func TestFileServiceImplDownloadFile_InternalError(t *testing.T) {
+func TestDownloadFile_SendMetadataError(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockFileStorage := NewMockFileStorage(ctrl)
+	l, err := logger.Initialize("error")
+	require.NoError(t, err, "Error init logger")
+
+	fileService := NewFileService(mockFileStorage, "/tmp", l)
+
+	stream := NewMockFileServiceV1_DownloadFileServer(ctrl)
+
+	userID := "1"
+	fileID := "1"
+	filePath := "/tmp/test.txt"
+	fileData := []byte("file data")
+
+	fileMetadata := model.File{
+		ID:     fileID,
+		UserID: userID,
+		Name:   "test.txt",
+		Size:   int64(len(fileData)),
+		Path:   filePath,
+	}
+
+	mockFileStorage.EXPECT().GetByID(gomock.Any(), fileID).Return(fileMetadata, nil)
+
+	stream.EXPECT().Send(&pb.DownloadFileResponseV1{
+		Name: fileMetadata.Name,
+		Size: fileMetadata.Size,
+	}).Return(fmt.Errorf("send metadata error"))
+
+	tmpFile, err := os.Create(filePath)
+	require.NoError(t, err, "unexpected error creating tmp file")
+	defer tmpFile.Close()
+	defer os.Remove(filePath)
+	_, err = tmpFile.Write(fileData)
+	require.NoError(t, err, "unexpected error writing to tmp file")
+
+	err = fileService.DownloadFile(context.Background(), userID, fileID, stream)
+	assert.Error(t, err, "Expected error when sending file metadata fails")
+}
+
+func TestFileServiceImplDownloadFile_SendFilePartError(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockFileStorage := NewMockFileStorage(ctrl)
+	l, err := logger.Initialize("error")
+	require.NoError(t, err, "Error init logger")
+
+	fileService := NewFileService(mockFileStorage, "/tmp", l)
+
+	stream := NewMockFileServiceV1_DownloadFileServer(ctrl)
+
+	userID := "1"
+	fileID := "1"
+	filePath := "/tmp/test.txt"
+	fileData := []byte("file data")
+
+	fileMetadata := model.File{
+		ID:     fileID,
+		UserID: userID,
+		Name:   "test.txt",
+		Size:   int64(len(fileData)),
+		Path:   filePath,
+	}
+
+	mockFileStorage.EXPECT().GetByID(gomock.Any(), fileID).Return(fileMetadata, nil)
+
+	stream.EXPECT().Send(&pb.DownloadFileResponseV1{
+		Name: fileMetadata.Name,
+		Size: fileMetadata.Size,
+	}).Return(nil)
+
+	stream.EXPECT().Send(gomock.Any()).Return(fmt.Errorf("send file part error")).Times(1)
+
+	tmpFile, err := os.Create(filePath)
+	require.NoError(t, err, "unexpected error creating tmp file")
+	defer tmpFile.Close()
+	defer os.Remove(filePath)
+	_, err = tmpFile.Write(fileData)
+	require.NoError(t, err, "unexpected error writing to tmp file")
+
+	err = fileService.DownloadFile(context.Background(), userID, fileID, stream)
+	assert.Error(t, err, "Expected error when sending file part fails")
+}
+
+func TestDownloadFile_InternalError(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -203,7 +308,7 @@ func TestFileServiceImplDownloadFile_InternalError(t *testing.T) {
 	assert.Error(t, err, "Expected internal error during file download")
 }
 
-func TestFileServiceImplDeleteFile_Success(t *testing.T) {
+func TestDeleteFile_Success(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -236,7 +341,7 @@ func TestFileServiceImplDeleteFile_Success(t *testing.T) {
 	assert.NoError(t, err, "Expected no error during file deletion")
 }
 
-func TestFileServiceImplDeleteFile_NotFound(t *testing.T) {
+func TestDeleteFile_NotFound(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -255,7 +360,34 @@ func TestFileServiceImplDeleteFile_NotFound(t *testing.T) {
 	assert.ErrorAs(t, err, &er.NotFoundError{}, "Expected NotFoundError when file is not found")
 }
 
-func TestFileServiceImplDeleteFile_InternalError(t *testing.T) {
+func TestDeleteFile_AccessDenied(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockFileStorage := NewMockFileStorage(ctrl)
+	l, err := logger.Initialize("error")
+	require.NoError(t, err, "Error init logger")
+
+	fileService := NewFileService(mockFileStorage, "/tmp", l)
+
+	userID := "1"
+	fileID := "1"
+	filePath := "/tmp/test.txt"
+
+	fileMetadata := model.File{
+		ID:     fileID,
+		UserID: "2",
+		Path:   filePath,
+	}
+
+	mockFileStorage.EXPECT().GetByID(gomock.Any(), fileID).Return(fileMetadata, nil)
+
+	err = fileService.DeleteFile(context.Background(), userID, fileID)
+	assert.ErrorAs(t, err, &er.ForbiddenError{},
+		"Expected ForbiddenError when user attempts to delete file not belonging to them")
+}
+
+func TestDeleteFile_GetByIDInternalError(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -274,7 +406,39 @@ func TestFileServiceImplDeleteFile_InternalError(t *testing.T) {
 	assert.Error(t, err, "Expected internal error when retrieving file metadata for deletion")
 }
 
-func TestFileServiceImplGetFileByID_Success(t *testing.T) {
+func TestDeleteFile_DeleteInternalError(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockFileStorage := NewMockFileStorage(ctrl)
+	l, err := logger.Initialize("error")
+	require.NoError(t, err, "Error init logger")
+
+	fileService := NewFileService(mockFileStorage, "/tmp", l)
+
+	userID := "1"
+	fileID := "1"
+	filePath := "/tmp/test.txt"
+
+	fileMetadata := model.File{
+		ID:     fileID,
+		UserID: userID,
+		Path:   filePath,
+	}
+
+	mockFileStorage.EXPECT().GetByID(gomock.Any(), fileID).Return(fileMetadata, nil)
+	mockFileStorage.EXPECT().Delete(gomock.Any(), fileID).Return(fmt.Errorf("internal error"))
+
+	tmpFile, err := os.Create(filePath)
+	require.NoError(t, err)
+	defer tmpFile.Close()
+	defer os.Remove(filePath)
+
+	err = fileService.DeleteFile(context.Background(), userID, fileID)
+	assert.Error(t, err, "Expected internal error during file deletion")
+}
+
+func TestGetFileByID_Success(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -302,7 +466,7 @@ func TestFileServiceImplGetFileByID_Success(t *testing.T) {
 	assert.Equal(t, expectedFile, file, "Expected file to match")
 }
 
-func TestFileServiceImplGetFileByID_NotFound(t *testing.T) {
+func TestGetFileByID_NotFound(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -321,7 +485,7 @@ func TestFileServiceImplGetFileByID_NotFound(t *testing.T) {
 	assert.ErrorAs(t, err, &er.NotFoundError{}, "Expected NotFoundError when file is not found")
 }
 
-func TestFileServiceImplGetFileByID_InternalError(t *testing.T) {
+func TestGetFileByID_InternalError(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -340,7 +504,7 @@ func TestFileServiceImplGetFileByID_InternalError(t *testing.T) {
 	assert.Error(t, err, "Expected internal error during GetFileByID")
 }
 
-func TestFileServiceImplGetAllFiles_Success(t *testing.T) {
+func TestGetAllFiles_Success(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -363,7 +527,7 @@ func TestFileServiceImplGetAllFiles_Success(t *testing.T) {
 	assert.Equal(t, expectedFiles, files, "Expected files list to match")
 }
 
-func TestFileServiceImpl_GetAllFiles_InternalError(t *testing.T) {
+func TestGetAllFiles_InternalError(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
