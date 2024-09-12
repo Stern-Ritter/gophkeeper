@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package gophkeeper.gophkeeperapi.v1;
+
+import "gophkeeper/gophkeeperapi/v1/card.proto";
+
+option go_package = "gophkeeper/gophkeeperapi/v1";
+
+
+service CardServiceV1 {
+  rpc AddCard(AddCardRequestV1) returns (AddCardResponseV1);
+  rpc DeleteCard(DeleteCardRequestV1) returns (DeleteCardResponseV1);
+  rpc GetCards(GetCardsRequestV1) returns (GetCardsResponseV1);
+}

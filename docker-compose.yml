@@ -1,0 +1,71 @@
+version: "3.9"
+
+services:
+  gophermart:
+    container_name: gophkeeper-service
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3300:3300"
+    environment:
+      ADDRESS: :3300
+      DATABASE_DSN: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      FILE_STORAGE_PATH: ${FILE_STORAGE_PATH}
+      AUTH_KEY: ${AUTH_KEY}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
+      TLS_CERT: ${TLS_CERT}
+      TLS_KEY: ${TLS_KEY}
+    env_file:
+      - .env
+    networks:
+      - gophkeeper-network
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://gophermart-service:8080/healthcheck || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  db:
+    image: postgres:16.3
+    container_name: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+    networks:
+      - gophkeeper-network
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    command: [ "postgres", "-c", "log_statement=all" ]
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+    networks:
+      - gophkeeper-network
+
+networks:
+  gophkeeper-network:
+
+volumes:
+  pgdata:

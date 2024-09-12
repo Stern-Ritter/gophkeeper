@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package gophkeeper.gophkeeperapi.v1;
+
+import "buf/validate/validate.proto";
+
+option go_package = "gophkeeper/gophkeeperapi/v1";
+
+message SignUpRequestV1 {
+  string login = 1 [(buf.validate.field).cel = {
+    id: "login",
+    message: "Login should not be empty and should not exceed 30 characters"
+    expression: "size(this) >= 1 && size(this) <= 30"
+  }];
+  string password = 2 [(buf.validate.field).cel = {
+    id: "password",
+    message: "Password should be at least 8 characters and at most 256 characters long",
+    expression: "size(this) >= 8 && size(this) <= 256"
+  }];
+}
+
+message SignUpResponseV1 {
+  string token = 1;
+}
+
+message SignInRequestV1 {
+  string login = 1;
+  string password = 2;
+}
+
+message SignInResponseV1 {
+  string token = 1;
+}

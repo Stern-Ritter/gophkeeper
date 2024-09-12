@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package gophkeeper.gophkeeperapi.v1;
+
+import "gophkeeper/gophkeeperapi/v1/text.proto";
+
+option go_package = "gophkeeper/gophkeeperapi/v1";
+
+service TextServiceV1 {
+  rpc AddText(AddTextRequestV1) returns (AddTextResponseV1);
+  rpc DeleteText(DeleteTextRequestV1) returns (DeleteTextResponseV1);
+  rpc GetTexts(GetTextsRequestV1) returns (GetTextsResponseV1);
+}

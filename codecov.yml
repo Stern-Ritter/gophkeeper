@@ -1,0 +1,14 @@
+coverage:
+  status:
+    project:
+      default:
+        target: 80%
+  ignore:
+    - "proto/**"
+    - "vendor/**"
+    - "**/generated/**"
+    - "**/*.gen.go"
+    - "**/testdata/**"
+    - "migrations/**"
+    - "certs/**"
+    - "cmd/staticlint/**"

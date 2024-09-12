@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package gophkeeper.gophkeeperapi.v1;
+
+import "buf/validate/validate.proto";
+
+option go_package = "gophkeeper/gophkeeperapi/v1";
+
+message AccountV1 {
+  string id = 1;
+  string user_id = 2;
+  string login = 3;
+  string password = 4;
+  string comment = 5;
+}
+
+message AddAccountRequestV1 {
+  string login = 1 [(buf.validate.field).cel = {
+    id: "login",
+    expression: "size(this) >= 1",
+    message: "Login should not be empty"
+  }];
+  string password = 2 [(buf.validate.field).cel = {
+    id: "password",
+    expression: "size(this) >= 1",
+    message: "Password should not be empty"
+  }];
+  string comment = 3 [(buf.validate.field).cel = {
+    id: "comment",
+    expression: "size(this) <= 1024",
+    message: "Comment should not exceed 1024 characters"
+  }];
+}
+
+message AddAccountResponseV1 {}
+
+message DeleteAccountRequestV1 {
+  string id = 1 [(buf.validate.field).cel = {
+    id: "id",
+    expression: "size(this) >= 1",
+    message: "Deleted account data ID should not be empty"
+  }];
+}
+
+message DeleteAccountResponseV1 {}
+
+message GetAccountsRequestV1 {}
+
+message GetAccountsResponseV1 {
+  repeated AccountV1 accounts = 1;
+}

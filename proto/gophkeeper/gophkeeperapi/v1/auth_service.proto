@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package gophkeeper.gophkeeperapi.v1;
+
+import "gophkeeper/gophkeeperapi/v1/auth.proto";
+
+option go_package = "gophkeeper/gophkeeperapi/v1";
+
+service AuthServiceV1 {
+  rpc SignUp(SignUpRequestV1) returns (SignUpResponseV1);
+  rpc SignIn(SignInRequestV1) returns (SignInResponseV1);
+}
