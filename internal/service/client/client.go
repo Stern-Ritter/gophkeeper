@@ -10,6 +10,8 @@ import (
 	config "github.com/Stern-Ritter/gophkeeper/internal/config/client"
 )
 
+// Application represents an interface for interacting with a tview application.
+// It provides methods for managing input, mouse events, screen, drawing, and focus.
 type Application interface {
 	SetInputCapture(capture func(event *tcell.EventKey) *tcell.EventKey) *tview.Application
 	GetInputCapture() func(event *tcell.EventKey) *tcell.EventKey
